@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>{$user.username} - {:seo('title')}</title>
+    <link rel="stylesheet" href="/static/hqui/libs/layui/css/layui.css"/>
+    <link rel="stylesheet" href="/static/hqui/module/admin.css"/>
+<style>
+    .basicinfo {
+        margin: 15px 0;
+    }
+
+    .basicinfo .row > .col-xs-4 {
+        padding-right: 0;
+    }
+
+    .basicinfo .row > div {
+        margin: 5px 0;
+    }
+</style>
+{include file="index/common/head"/}
+<body>
+
+{include file="index/common/header" /}
+<div id="content-container" class="container">
+    <div class="row">
+        <div class="col-md-3">
+            {include file="index/common/sidenav" /}
+              <!--未退出登录更新连续登录和最大连续登录/时间-->
+              {$days}
+              <!--未退出登录更新连续登录和最大连续登录/时间-->
+        </div>
+        <div class="col-md-9">
+            <div class="panel panel-default ">
+                <div class="panel-body">
+               <h2 class="page-header">
+                     {$user.id == 1 ? '<a href="/admin/index" target="_blank">Member Center</a>' : 'Member Center'}&nbsp;
+                     <span style="font-size:8px;" id="myTime"></span><span style="font-size:8px;">
+                    &nbsp;在线&nbsp;{php} echo maktimes(floor($list['line_time']));{/php} <a ew-event="message" data-url="/user/message" title="消息">
+                    <i class="layui-icon layui-icon-notice"></i>
+                    {if $notice > 0}
+                    <span class="layui-badge-dot"></span><!--小红点-->
+                    {/if}
+                </a></span>
+                  
+                        <a href="/signin" class="btn btn-success pull-right {$signin?'disabled':''} "><i class="fa fa-pencil"></i>
+                            {$signin ? __('Signed in') : __('No sign in')}</a>
+                    </h2>
+                    <div class="row user-baseinfo">
+                        <div class="col-md-3 col-sm-3 col-xs-2 text-center user-center">
+                            <a href="/user/profile" title="{:__('head portrait')}">
+                                <span class="avatar-img"><img src="{$userInfo.avatar}" alt=""></span>
+                            </a>
+                        </div>
+                        {if $userInfo.email == ""}
+                    <script>window.alert('{:__('Please go to personal data binding mailbox to retrieve the password!')}');</script>
+                      
+                       {/if}
+                        <div class="col-md-9 col-sm-9 col-xs-10">
+                            <!-- Content -->
+                            <div class="ui-content">
+                                <!-- Heading -->
+                                <h4><a href="#">{$userInfo.username}</a></h4>
+                                <!-- Paragraph -->
+                                    <div class="row">
+                                        
+                                        <div class="col-xs-8 col-md-4">
+                                         <a href="/signin">{:__('Insist on signing in, surprise')}</a>
+                                        </div>
+                                        
+                                    
+                                    </div>
+
+                                <!-- Success -->
+                                <div class="basicinfo">
+                                    <div class="row">
+                                        
+                                        <div class="col-xs-4 col-md-2">{:__('QQ quick login')}</div>
+                                        <div class="col-xs-8 col-md-4">
+                                            {if $userInfo.openid}<span style="color: #fff;background-color: #009688;border-radius:5px;font-size: 10px;padding: 4px 6px;">{:__('Bound')}</span> <a href="/qqlogin"><i class="layui-icon layui-icon-login-qq">  {:__('Change the binding')}</i></a>{else/}<span style="color: #fff;background-color: #FF5722;border-radius:5px;font-size: 10px;padding: 4px 6px;">{:__('Unbound')}</span> <a href="/qqlogin"><i class="layui-icon layui-icon-login-qq">{:__('binding')}</i></a>{/if}
+
+                                        </div>
+                                        <div class="col-xs-4 col-md-2">{:__('Grade')}</div>
+                                        <div class="col-xs-8 col-md-4">
+                                            <a href="javascript:;" class="viewmoney">{$userInfo.level}</a> {:__('level')}
+
+                                        </div>
+                                        </div>
+                                        <div class="row">
+                                        
+                                        <div class="col-xs-4 col-md-2">{:__('balance')}</div>
+                                        <div class="col-xs-8 col-md-4">
+                                            <a href="javascript:;" class="viewmoney">{$userInfo.money}</a> {:__('element')}
+                                        </div>
+                                        <div class="col-xs-4 col-md-2">{:__('integral')}</div>
+                                        <div class="col-xs-8 col-md-4">
+                                            <a href="javascript:;" class="viewscore">{$userInfo.score}</a>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-xs-4 col-md-2">{:__('Continuous login days')}</div>
+                                        <div class="col-xs-8 col-md-4">{$userInfo.successions} {:__('day')}</div>
+                                        <div class="col-xs-4 col-md-2">{:__('Maximum login days')}</div>
+                                        <div class="col-xs-8 col-md-4">{$userInfo.maxsuccessions} {:__('day')}（连续）</div>
+                                    </div>
+                                    <div class="row">  
+                                   
+                                        <div class="col-xs-4 col-md-2">{:__('login time')}</div>
+                                        <div class="col-xs-8 col-md-4">{$logintime|date='Y-m-d H:i:s'}</div>
+                                        <div class="col-xs-4 col-md-2">{:__('Remaining login time')}</div>
+                                        <div class="col-xs-8 col-md-4"><i style="color:red"><span id="hideD"><strong id="RemainD"></strong>天</span> <span id="hideH"><strong id="RemainH"></strong>小时</span><span id="hideM"> <strong id="RemainM"></strong>分钟</span> <span id="hideS"><strong id="RemainS"></strong>秒</span></i></div>
+                                 
+                                    </div> 
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+<!-- 加载动画 -->
+<div class="page-loading">
+    <div class="ball-loader">
+        <span></span><span></span><span></span><span></span>
+    </div>
+</div>
+
+<!-- js部分 -->
+<script type="text/javascript" src="/static/hqui/libs/layui/layui.js"></script>
+<script type="text/javascript" src="/static/hqui/js/common.js"></script>
+<script>
+
+
+    layui.use(['index'], function () {
+        var $ = layui.jquery;
+        var index = layui.index;
+
+        // 默认加载主页
+        index.loadHome({
+            menuPath: '/user/index',
+            menuName: '<i class="layui-icon layui-icon-home"> </i>'
+        });
+        $('.layui-body>.layui-tab[lay-filter="admin-pagetabs"]').attr('lay-autoRefresh', 'true');
+        //开启轮询
+        setInterval("test()",20000);
+    });
+    //查询通知
+    function test() {
+        layui.use(['notice'], function () {
+            var $ = layui.jquery;
+            $.ajax({
+                url: "{:url('user/get_notice')}",
+                async:true,
+                type: 'get',
+                success: function (res) {
+                    console.log(res.data);
+                    if (res.data > 0){
+                        var notice = layui.notice;
+                        notice.warning({
+                            title: '消息通知',
+                            message: '你今天有'+res.data+'条新的提醒待处理,请及时处理!',
+                            audio:'5',
+                            position:'bottomRight',
+                            balloon:true,
+                        });
+                    }
+                }
+            })
+        });
+    }
+</script>
+<script language="JavaScript">
+    var runtimes = 0;
+    function GetRTime(){
+        var nMS = <?php echo $overtime; ?>*1000-runtimes*1000;
+ 
+        if (nMS>=0){
+            var nD=Math.floor(nMS/(1000*60*60*24))%24;
+            var nH=Math.floor(nMS/(1000*60*60))%24;
+            var nM=Math.floor(nMS/(1000*60)) % 60;
+            var nS=Math.floor(nMS/1000) % 60;
+            document.getElementById("RemainD").innerHTML=nD < 10 ? "0" + nD : nD;
+            document.getElementById("RemainH").innerHTML=nH < 10 ? "0" + nH : nH;
+            document.getElementById("RemainM").innerHTML=nM < 10 ? "0" + nM : nM;
+            document.getElementById("RemainS").innerHTML=nS < 10 ? "0" + nS : nS;
+            runtimes++;
+            if(nD==0){
+                //天数0 隐藏天数
+                document.getElementById("hideD").style.display="none";
+                if(nH==0){
+                    //数0 隐藏天数
+                    document.getElementById("hideH").style.display="none";
+                    if(nM==0){
+                        document.getElementById("hideM").style.display="none";
+                        if(nS==0){
+                            alert("倒计时完毕");
+                        }
+                    }
+                }
+            }
+            setTimeout("GetRTime()",1000);
+        }
+    }
+    window.onload = function() {
+        GetRTime();
+    }
+</script>
+<!--网站时间-->
+<script>
+function getCurDate()  
+{  
+ var d = new Date();  
+ var week;  
+ switch (d.getDay()){  
+ case 1: week="星期一"; break;  
+ case 2: week="星期二"; break;  
+ case 3: week="星期三"; break;  
+ case 4: week="星期四"; break;  
+ case 5: week="星期五"; break;  
+ case 6: week="星期六"; break;  
+ default: week="星期天";  
+ }  
+ var years = d.getFullYear();  
+ var month = add_zero(d.getMonth()+1);  
+ var days = add_zero(d.getDate());  
+ var hours = add_zero(d.getHours());  
+ var minutes = add_zero(d.getMinutes());  
+ var seconds=add_zero(d.getSeconds());  
+ var ndate = years+"年"+month+"月"+days+"日 "+hours+":"+minutes+":"+seconds+" "+week;  
+ myTime.innerHTML = ndate;  
+}  
+  
+function add_zero(temp)  
+{  
+ if(temp<10) return "0"+temp;  
+ else return temp;  
+}  
+  
+setInterval("getCurDate()", 100);  
+</script>
+{include file="index/common/footer" /}
+</body>
+{include file="index/common/script" /}
+</html>

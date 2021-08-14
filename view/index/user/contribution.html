@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html>
+
+    <link rel="stylesheet" href="/static/layui/css/layui.css" media="all">
+    <script src="/static/layui/layui.js" charset="utf-8"></script>
+    <script src="/static/jquery.min.js" charset="utf-8"></script>
+{include file="index/common/head"/}
+<link href="/static/behand/css/user.css" rel="stylesheet">
+<body>
+{include file="index/common/header" /}
+
+<!--新增表单 start-->
+<div id="content-container" class="container">
+    <div class="row">
+        <div class="col-md-3" >
+            <span>{include file="index/common/sidenav" /}</span>
+           
+        </div>
+        <div class="col-md-9">
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <h3 style="margin-top: 15px;" class="page-header"><i style="margin-top: -30px;">Contribution zone</i></h3>
+       <form class="layui-form" id="add-form" action="" lay-filter="add-form">
+        <input type="hidden" name="id" value="0" id="id">
+
+        <div class="layui-form-item">
+            <label class="layui-form-label" style="width: 100px">{:__('pictures')}</label>
+            <button type="button" class="layui-btn" id="ajax-admin-avatar">{:__('Upload pictures')}</button>
+            <span class="layui-upload-list" style="padding-left: 20px;">
+                <img class="layui-upload-img layui-circle" id="image" width="60" height="60">
+                <p id="imageText"></p>
+            </span>
+            <input type="hidden" name="image" value="">
+        </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label" style="width: 100px">{:__('Column')}</label>
+            <div class="layui-input-inline">
+                <select class="layui-input" name="cat_id" id="cat_id" lay-verify="required" lay-search="">
+                    <option value="0">{:__('Please select')}</option>
+                    {foreach $name as $vo}
+                    <option value="{$vo.id}">{$vo.name}</option>
+                    {/foreach}
+                </select>
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label" style="width: 100px">{:__('author')}</label>
+            <div class="layui-input-inline">
+                <input type="text" name="author" id="author" value="{$user.username?:'游客'}" lay-verify="required"
+                       placeholder="作者"
+                       autocomplete="off" class="layui-input">
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label" style="width: 100px">{:__('title')}</label>
+            <div class="layui-input-inline">
+                <input type="text" name="title" id="title" value=""
+                       placeholder="标题" lay-verify="required"
+                       autocomplete="off" class="layui-input">
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label" style="width: 100px">{:__('content')}</label>
+            <div class="layui-input-inline">
+                <textarea lay-verify="required" placeholder="{:__('Please input the content')}" name="content" id="content" class="layui-textarea"></textarea>
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label" style="width: 100px">{:__('key word')}</label>
+             <div class="layui-input-inline">
+                <input type="text" name="keyword" id="keyword" value=""
+                       placeholder="{:__('Keywords, separated by commas')}" lay-verify="required"
+                       autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label" style="width: 100px">{:__('sign')}</label>
+            <div class="layui-input-block">
+                <input type="radio" name="flag" value="1" title="{:__('newest')}" checked>
+                <input type="radio" name="flag" value="2" title="{:__('Hot')}">
+                <input type="radio" name="flag" value="3" title="{:__('recommend')}">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label" style="width: 100px">{:__('sort')}</label>
+             <div class="layui-input-inline">
+                <input type="number" name="weigh" id="weigh" value="0" placeholder="{:__('Please input sort')}" lay-verify="required"
+                       autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label" style="width: 100px"></label>
+            <div class="layui-input-block">
+                <button class="layui-btn" lay-submit lay-filter="save">{:__('preservation')}</button>
+                <button type="button" class="layui-btn layui-btn-danger" onclick="layer.closeAll()">{:__('cancel')}</button>
+            </div>
+        </div>
+    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{include file="index/common/script" /}
+
+
+<script>
+    layui.use(['table', 'form','upload'], function () {
+        var table = layui.table,
+            $ = layui.jquery,
+            upload = layui.upload,
+            form = layui.form;
+        form.render();
+
+      
+        //普通图片上传
+      var uploadInst = upload.render({
+    elem: '#ajax-admin-avatar',
+            exts: 'jpg|png|jpeg|gif|svg',
+            size: 2048,
+    url: '/contribution/uploadImage', //改成您自己的上传接口
+    done: function (result) {
+        // 上传完毕回调
+        if (result.code === 1) {
+            $('#image').attr('src', result.url);
+            //this.item.prev('input').val(result.url);
+            $('input[name="image"]').val(result.url);
+            layer.msg('上传成功', {icon: 1});
+        } else {
+            layer.msg(result.msg, {icon: 2});
+        }
+    }
+        });
+
+       
+        //表单提交
+        form.on('submit(save)', function (data) {
+       var index = layer.msg('<i>{:__('Submitting, please wait')}</i>', {
+        icon: 16,
+        time: false,
+        shade: 0.3,
+        anim: 4
+    });
+            params = data.field;
+            submit($, params);
+            return false;
+        });
+
+        // 新增
+        function submit($, params) {
+            var url = '/contribution/add';
+            $.post(url, params, function (res) {
+                if (res.code == 0) {
+                    layer.msg(res.msg, {icon: 1});
+                    setTimeout(function () {
+                        layer.closeAll();   // 关闭弹窗
+                        location.reload();  // 页面刷新
+                    }, 1500)
+                } else {
+                    layer.msg(res.msg, {icon: 0})
+                }
+            }, 'json');
+        }
+        });
+
+
+</script>
+
+{include file="index/common/footer" /}
+</body>
+
+</html>

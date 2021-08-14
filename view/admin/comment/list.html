@@ -1,0 +1,311 @@
+{include file="common/head" /}
+
+<!--search-->
+<div class="layui-layout layui-layout-admin" style="padding-left: 20px;">
+    <div class="layui-row" style="margin-top: 20px;">
+
+        <form class="layui-form" action="" onsubmit="return false;">
+            <div class="layui-form-item">
+                <label class="layui-form-label">{:__('Comments')}</label>
+                <div class="layui-input-inline">
+                    <input type="text" id="uname" name="uname" placeholder="{:__('Comments')}" lay-verify="required" autocomplete="off"
+                           class="layui-input">
+                </div>
+
+                <label class="layui-form-label">{:__('Created on')}</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="createtime" class="layui-input" id="createtime" placeholder="{:__('Created on')}">
+                </div>
+
+                <div class="layui-col-xs1 search_text">
+                    <button class="layui-btn" id="layui-btn" data-type="reload" lay-submit ><i class="layui-icon">&#xe615;{:__('query')}</i>
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<!--search-->
+<table class="layui-hide" id="comment" lay-filter="comment"></table>
+
+<script type="text/html" id="toolbarDemo">
+    <div class="layui-btn-container">
+        <button class="layui-btn layui-btn-sm" lay-event="delete">{:__('Batch delete')}</button>
+        <button class="layui-btn layui-btn-sm" lay-event="refresh">{:__('Refresh')}</button>
+    </div>
+</script>
+
+<script type="text/html" id="barDemo">
+    <a class="layui-btn layui-icon layui-icon-edit layui-btn-xs" lay-event="edit">{:__('edit')}</a>
+    <a class="layui-btn layui-btn-danger layui-btn-xs layui-icon layui-icon-delete" lay-event="del">{:__('delete')}</a>
+</script>
+<!--新增表单 start-->
+<div id="add-main" style="display: none;margin-top: 20px;">
+    <form class="layui-form" id="add-form" action="" lay-filter="add-form">
+        <input type="hidden" name="id" value="0" id="id">
+      
+        <div class="layui-form-item">
+            <label class="layui-form-label">{:__('Comment content')}</label>
+            <div class="layui-input-block">
+                 <textarea style="width:96%;" lay-verify="required" placeholder="{:__('Please input the content')}" name="content" id="content" class="layui-textarea"></textarea>
+            </div>
+        </div>
+       
+        <div class="layui-form-item">
+            <label class="layui-form-label"></label>
+            <div class="layui-input-block">
+                <button class="layui-btn" lay-submit lay-filter="save">{:__('preservation')}</button>
+                <button type="button" class="layui-btn layui-btn-danger" onclick="layer.closeAll()">{:__('cancel')}</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+
+<script type="text/html" id="switchTpl">
+        <input type="checkbox" name="status" lay-skin="switch" lay-filter="*" lay-text="{:__('normal')}|{:__('locking')}" data-url="{:url('comment/edit')}?id={{d.id}}" {{d.status==1?'checked':''}}>
+    </script>
+<!--新增表单 end-->
+<script>
+    layui.use(['table', 'form', 'laydate'], function () {
+        var table = layui.table,
+            laydate = layui.laydate,
+            form = layui.form;
+        form.render();
+
+        // 搜索 start 引入时间组件laydate---------------------
+        // 时间
+        laydate.render({
+            elem: '#createtime'
+            , range: true
+        });
+
+        //根据搜索条件重加载表格
+        var $ = layui.$, active = {
+            reload: function () {
+                //执行重载
+                table.reload('comment', {
+                    page: {
+                        curr: 1 //重新从第 1 页开始
+                    }
+                    , where: {
+                        uname: $('#uname').val(), // 名字不能和编辑弹框重复
+                        createtime: $('#createtime').val()
+                    }
+                });
+            }
+        };
+        $('#layui-btn').on('click', function () {
+            var type = $(this).data('type');
+            active[type] ? active[type].call(this) : '';
+        });
+        // 搜索 end-----------------------------------------
+        table.render({
+            elem: '#comment'
+            , url: '/comment/info'  // 请求数据路由地址
+            , toolbar: '#toolbarDemo' //开启头部工具栏，并为其绑定左侧模板
+            , defaultToolbar: ['filter', 'exports', 'print', { //自定义头部工具栏右侧图标。如无需自定义，去除该参数即可
+                title: '提示'
+                , layEvent: 'LAYTABLE_TIPS'
+                , icon: 'layui-icon-tips'
+            }]
+            , title: '{:__('User data table')}'
+            , cols: [[
+                {type: 'checkbox', fixed: 'left'}
+                , {field: 'id', title: 'ID', width: 80, align: 'center', fixed: 'left'}
+                , {field: 'article_id', title: '文章ID', align: 'center', width: 100}
+                , {field: 'user_id', title: '会员ID', align: 'center', width: 100}
+                , {field: 'ip', title: 'IP', align: 'center', width: 180}
+                , {field: 'content', title: '评论', align: 'center', width: 300}
+                , {field: 'createtime', title: '添加时间', align: 'center', width: 180}
+                , {field: 'status', title: '状态', align: 'center', width: 120,templet: '#switchTpl'}
+                , {fixed: 'right', title: '操作', align: 'center', toolbar: '#barDemo', width: 150}
+            ]]
+            , page: true
+            , limit: 10
+            , text: {none: '{:__('No data available')}'}
+        });
+        //表单提交
+        form.on('submit(save)', function (data) {
+        var index = layer.msg('{:__('Submitting, please wait')}', {
+        icon: 16,
+        time: false,
+        shade: 0.3
+    });
+            params = data.field;
+            submit($, params);
+            return false;
+        });
+
+// 通用开关
+form.on('switch(*)', function (data) {
+    var index = layer.msg('{:__('Modifying, please wait')}', {
+        icon: 16,
+        time: false,
+        shade: 0.3
+    });
+    // 参数
+    var obj = {};
+    obj[$(this).attr('name')] = this.checked == true ? 1 : 2;
+    obj['_verify'] = 0;
+    $.ajax({
+        url: $(this).data('url'),
+        type: 'post',
+        dataType:"json",
+        data: obj,
+        success: function (result) {
+            layer.close(index);
+            layer.msg(result.msg, {icon: 1});
+                        location.reload();  // 页面刷新
+        },
+        error: function (xhr, state, errorThrown) {
+            layer.close(index);
+            layer.msg(state + '：' + errorThrown, {icon: 2});
+        }
+    });
+});
+        // 新增
+        function submit($, params) {
+            var url = params.id > 0 ? '/comment/edit' : '/comment/add';
+            $.post(url, params, function (res) {
+                if (res.code == 0) {
+                    layer.msg(res.msg, {icon: 1});
+                    setTimeout(function () {
+                        layer.closeAll();   // 关闭弹窗
+                        location.reload();  // 页面刷新
+                    }, 1500)
+                } else {
+                    layer.msg(res.msg, {icon: 0})
+                }
+            }, 'json');
+        }
+
+        //头工具栏事件
+        table.on('toolbar(comment)', function (obj) {
+            var checkStatus = table.checkStatus(obj.config.id);
+            switch (obj.event) {
+                case 'add':
+                    // 清空表单
+                    document.getElementById('id').value = 0;
+                    $("#add-form")[0].reset();
+                    layui.form.render();
+                   // 打开窗口
+                  var title = $(this).html();
+                     var width = $(this).data('width');
+                     var height = $(this).data('height');
+                if(navigator.userAgent.match(/(iPhone|iPod|Android|ios)/i)){
+                      var width = '90%';
+                      var height = '300px';
+                     }else{
+                        var width = '500px';
+                      var height = '300px';
+                     };
+                // 打开窗口
+                layer.open({  
+                     type: 1 //Page层类型
+                     ,area: [width, height]
+                     ,title: title 
+                     ,closeBtn: false
+                     ,shade: 0.3 //遮罩透明度
+                     ,maxmin: true //允许全屏最小化
+                     ,anim: 4 //0-6的动画形式，-1不开启
+                     ,shadeClose: true
+                     ,id: 'layui-id' //设定一个id，防止重复弹出
+                     ,moveType: 0 //拖拽模式，0或者1
+                     ,content: $("#add-main")
+                     });
+                    break;
+                case 'delete':
+                    var data = checkStatus.data;
+                    var ids = [];
+                    data.forEach(item => {
+                        ids.push(item.id);
+                    });
+                    if (ids <= 0) {
+                        return layer.msg('{:__('Please select Delete item')}', {icon: 0});
+                    }
+               var index = layer.msg('<i>{:__('Submitting, please wait')}</i>', {
+                     icon: 16,
+                     time: false,
+                     shade: 0.3,
+                     anim: 1
+                 });
+                    $.post('/comment/del', {id: ids}, function (res) {
+                        if (res.code == 0) {
+                            layer.msg(res.msg, {icon: 1});
+                            setTimeout(function () {
+                                location.reload();  // 页面刷新
+                            }, 1500)
+                        } else {
+                            layer.msg(res.msg, {icon: 0});
+                        }
+                    }, 'json');
+                    break;
+                case 'refresh':
+                    location.reload();
+                    break;
+            }
+        });
+
+        //监听行工具事件
+        table.on('tool(comment)', function (obj) {
+            var data = obj.data;
+            //console.log(obj)
+            if (obj.event === 'del') {
+                layer.confirm('{:__('Really delete it')}', function (index) {
+                 
+                 var index = layer.msg('{:__('Submitting, please wait')}', {
+                   icon: 16,
+                   time: false,
+                   shade: 0.3
+                 });
+                    $.post('/comment/del', {id: data.id}, function (res) {
+                        if (res.code == 0) {
+                            layer.msg(res.msg, {icon: 1});
+                            setTimeout(function () {
+                                location.reload();  // 页面刷新
+                            }, 1500)
+                        } else {
+                            layer.msg(res.msg, {icon: 0});
+                            layer.close(index);
+                        }
+                    }, 'json')
+                });
+            } else if (obj.event === 'edit') {
+                if (data.length==0){
+                    return layer.msg('{:__('Please select a line')}', {icon: 0});
+                }
+                // 打开窗口
+                  var title = $(this).html();
+                     var width = $(this).data('width');
+                     var height = $(this).data('height');
+                if(navigator.userAgent.match(/(iPhone|iPod|Android|ios)/i)){
+                      var width = '90%';
+                      var height = '300px';
+                     }else{
+                        var width = '500px';
+                      var height = '300px';
+                     };
+                // 打开窗口
+                layer.open({  
+                     type: 1 //Page层类型
+                     ,area: [width, height]
+                     ,title: title 
+                     ,closeBtn: false
+                     ,shade: 0.3 //遮罩透明度
+                     ,maxmin: true //允许全屏最小化
+                     ,anim: 4 //0-6的动画形式，-1不开启
+                     ,shadeClose: true
+                     ,id: 'layui-id' //设定一个id，防止重复弹出
+                     ,moveType: 0 //拖拽模式，0或者1
+                     ,content: $("#add-main")
+                     });
+                document.getElementById('id').value = data.id;
+                document.getElementById('content').value = data.content;
+            }
+        });
+    })
+    ;
+
+
+</script>

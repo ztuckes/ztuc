@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html>
+<style type="text/css">
+    .txt{
+        overflow:auto;
+        overflow-x:auto;
+        overflow-y:auto;
+}
+</style>
+    <link rel="stylesheet" href="/static/layui/css/layui.css" media="all">
+    <script src="/static/layui/layui.js" charset="utf-8"></script>
+{include file="index/common/head"/}
+<body>
+{include file="index/common/header" /}
+
+<!--新增表单 start-->
+<div id="content-container" class="container">
+    <div class="row">
+        <div class="col-md-3" >
+            <span>{include file="index/common/sidenav" /}</span>
+           
+        </div>
+        <div class="col-md-9">
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <h3 style="margin-top: 15px;" class="page-header"><i style="margin-top: -30px;">Chat zone</i></h3>
+                    <!---分页---->
+                     
+            <div class="panel panel-default" id="comments">
+                <div class="panel-heading">
+                   <h3 class="panel-title">{:__('Chat record')}
+                        
+                        <small><?php echo str_replace('%a', '<b style="color: #ff0000;">' . $count . '</b>', __('Total chat comments')); ?></small>
+                    </h3>
+                </div>
+                <div class="panel-body">
+                    <div id="comment-container">
+                        <!-- S 评论列表 -->
+                        <div id="commentlist">
+                           {foreach $chatzone as $vo}
+                            <dl>
+                                <dt><a href="#" target="_blank"><img src='{$vo.avatar}'/></a></dt>
+                                <dd>
+                                    <div class="parent">
+                                        <cite><a href="/user/index">{$vo.username ?: '游客'}</a></cite>
+                                        <?php echo htmlentities(time_trans($vo['createtime'])); ?>
+                           <?php if(isset($user['id'])): ?>  
+                              {if $vo.user_id == $user.id}
+                                       {else/}
+                                       <small> <a href="javascript:;" uid="{$vo.user_id}" pid_id="{$vo.id}" title="你好！{$vo.username}！" class="reply">回复TA</a></small>
+                                       {/if}
+                                 <?php else: ?>
+                                <?php endif; ?>
+                                          
+                                        <p><i style="color:#ff0000;">主题：</i>{:html_entity_decode($vo['content'])}</p>
+                                       </div> 
+                        <hr class="layui-bg-green">
+                                        {if (!empty($chatreply))} 
+                                    {foreach $chatreply as $key => $val}
+                                          {if ($vo.id == $val['pid_id'])}
+                                    <div class="parent"> 
+                                    <p>&emsp;&emsp;<a href="/user/index">{$val['username']}</a>: {:html_entity_decode($val.content)}&emsp;<?php echo htmlentities(time_trans($val['createtime'])); ?>
+                                     <?php if(isset($user['id'])): ?>
+                                       {if $user.id == $val.user_id}
+                                        {else/}
+                                     <small> <a href="javascript:;" uid="{$val.user_id}" pid_id="{$vo.id}" title="你好！{$val.username}！" class="reply">回复TA</a></small>
+                                     {/if}
+                                     <?php else: ?>
+                                     <?php endif; ?> 
+                                     </p>
+                                    </div> 
+                  
+                                        {/if}
+                                     {/foreach}
+                                        {/if}
+                                </dd>
+                                <div class="clearfix"></div>
+                            </dl>
+                            {/foreach}
+                        </div>
+
+                       
+                        <!-- E 评论列表 -->
+
+                        <!-- S 评论分页 -->
+                        <div id="commentpager" class="text-center">
+                            {$chatzone|raw}
+                        </div>
+                        <!-- E 评论分页 -->
+
+                        <!-- S 发表评论 -->
+                        <div id="postcomment">
+                            <h3>发表评论 <a href="javascript:;">
+                                <small>取消回复</small>
+                            </a></h3>
+                            <form id="changepwd-form" class="layui-form" method="POST" action="" onclick="return false">
+                               
+                                <input type="hidden" name="pid_id" id="pid_id" value=""/>
+                                <input type="hidden" name="uid" id="uid" value=""/>
+                                <div class="form-group">
+                                    <textarea name="content" maxlength="199" id="commentcontent" cols="6" rows="5" class="form-control" {if !$user} placeholder='登录后再发表评论' disabled {else/} placeholder='发表评论' {/if}></textarea>
+                                </div>
+                                <div class="form-group">
+                                    <button href="javascript:;" class="btn btn-primary"  id="btn" lay-filter="save" lay-submit disabled="disabled">{:__('determine')}</button>
+                                    <button type="reset" class="btn btn-outline-primary" onclick="ClearTextArea()">{:__('Refill')}</button>
+                                </div>
+                            </form>
+                        </div>
+                        <!-- E 发表评论 -->
+                    </div>
+                </div>
+            </div>
+    </div>
+</div>
+    </div>
+</div>
+
+</div>
+{include file="index/common/footer" /}
+{include file="index/common/script" /}
+
+    <script>
+
+   $("textarea").on("input",function(){
+             var getContent = $("#commentcontent").val();
+ 
+             $(this).css("color","#232323");
+ 
+             if(getContent != ''){
+               $('#btn').attr('disabled', false).css('background','#009688').css('border','none').css('color','#fff');
+               }else{ 
+             $('#btn').attr('disabled', true).css('background','rgba(0,0,0,0.2)').css('border','1px solid #fff').css('color','#232323');
+    
+           }
+       });
+     
+    </script>
+<script>
+    layui.use('form', function () {
+        var $ = layui.jquery,
+            form = layui.form;
+        form.render();
+        //表单提交
+         form.on('submit(save)', function (data) {  
+           
+       var index = layer.msg('<i>{:__('Submitting, please wait')}</i>', {
+        icon: 16,
+        time: false,
+        shade: 0.3,
+        anim: 4
+    });
+           params = data.field;
+            submit($, params);
+            return false;
+        });
+
+        function submit($, params) {
+            $.post('/chatzone', params, function (res) {
+                 if (res.code == 0) {
+                    layer.msg(res.msg, {icon: 1});
+                    setTimeout(function () {
+                        
+                     if(isNaN(parseInt($("#btn").html()))){  
+                    
+                        var origText  = 5;
+                        var interval = setInterval(function(){
+                            var time = --origText;
+                            if(time <= 0) {
+                                clearInterval(interval);
+                               location.reload();
+                            }else{
+                                $('#btn').html(time+'{:__('second')}').css('border','none').css('color','#616161').css('background','buttonface').attr("disabled","true");
+                            
+                        }
+                        }, 1000);
+                         }
+
+                       // location.reload();
+                    }, 1500)
+                } else {
+                    layer.msg(res.msg, {icon: 0})
+                }
+            }, 'json');
+        }
+    })
+</script>
+
+</body>
+
+</html>

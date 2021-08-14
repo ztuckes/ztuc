@@ -1,0 +1,435 @@
+{include file="common/head" /}
+
+<script>
+layui.use('layer',function(){
+var layer = layui.layer;
+ 
+    layer.ready(function(){
+      layer.msg('<img src="{:seo('image')}" width="60" height="40">{:seo('welcomespeech')}', {time: 10*1000});
+    });  
+ 
+});
+</script>
+  <fieldset class="layui-elem-field layui-field-title">
+    <legend><i>当前时间：<span id="myTime"></span></i><i>___PHP版本：{php} echo PHP_VERSION;{/php}___THINKPHP版本：{$salt}</i></legend>
+  <hr class="layui-bg-green">
+  <div>
+    {$todaysDataCode !== 0 ? '<button type="button" class="layui-btn layui-bg-black layui-btn-disabled layui-btn-radius"><i>总发贴：<b>' . $cat . '</b>&nbsp;,&nbsp;<b>' . $todaysDataCode . '</b></i></button>' : ''} 
+
+    <button type="button" class="layui-btn layui-bg-green layui-btn-disabled layui-btn-radius"><i>总浏览：<b>{$view}</b></i></button>
+
+    <button type="button" class="layui-btn layui-bg-red layui-btn-disabled layui-btn-radius"><i>浏览：<b>{$theDayBeforeYesterday}</b>&nbsp;,&nbsp;<b>{$yesterDayview}</b>&nbsp;,&nbsp;<b>{$todaysDataView?:0}</b></i></button>
+
+    {$todaysDataClick !== 0 ? '<button type="button" class="layui-btn layui-bg-blue layui-btn-disabled layui-btn-radius"><i>总点赞：<b>' . $click . '</b>&nbsp;,&nbsp;<b>'.$todaysDataClick.'</b></i></button>' : ''}
+  
+    <button type="button" class="layui-btn layui-bg-gray layui-btn-disabled layui-btn-radius">实时在线：<font style="color: #ff0000;"><b>{$count}</b></FONT></button>
+    <button type="button" class="layui-btn layui-bg-gray layui-btn-disabled layui-btn-radius"><h4>剩余时间： <span id="hideD"><strong id="RemainD"></strong>天</span> <span id="hideH"><strong id="RemainH"></strong>小时</span><span id="hideM"> <strong id="RemainM"></strong>分钟</span> <span id="hideS"><strong id="RemainS"></strong>秒</span></h4></button>
+      
+  </div>
+  <?php
+   
+    if(isMobile()){
+    if (time()<=$model['mobilelogintime']+3600*24*7){
+        $overtime = floor((3600*24*7) - (time()-$model['mobilelogintime'])); //实际剩下的时间（单位/秒）
+      }else{
+
+        $overtime=0;
+      }
+    
+    }else{
+
+    if (time()<=$model['logintime']+3600*24*7){
+
+        $overtime = floor((3600*24*7) - (time()-$model['logintime'])); //实际剩下的时间（单位/秒）
+        }else{
+        $overtime=0;
+      }
+    }
+?> 
+<script language="JavaScript">
+    var runtimes = 0;
+    function GetRTime(){
+        var nMS = <?php echo $overtime; ?>*1000-runtimes*1000;
+ 
+        if (nMS>=0){
+            var nD=Math.floor(nMS/(1000*60*60*24))%24;
+            var nH=Math.floor(nMS/(1000*60*60))%24;
+            var nM=Math.floor(nMS/(1000*60)) % 60;
+            var nS=Math.floor(nMS/1000) % 60;
+            document.getElementById("RemainD").innerHTML=nD;
+            document.getElementById("RemainH").innerHTML=nH;
+            document.getElementById("RemainM").innerHTML=nM;
+            document.getElementById("RemainS").innerHTML=nS;
+            runtimes++;
+            if(nD==0){
+                //天数0 隐藏天数
+                document.getElementById("hideD").style.display="none";
+                if(nH==0){
+                    //数0 隐藏天数
+                    document.getElementById("hideH").style.display="none";
+                    if(nM==0){
+                        document.getElementById("hideM").style.display="none";
+                        if(nS==0){
+                            alert("倒计时完毕");
+                        }
+                    }
+                }
+            }
+            setTimeout("GetRTime()",1000);
+        }
+    }
+    window.onload = function() {
+        GetRTime();
+    }
+</script>
+
+
+            <hr class="layui-bg-green">
+
+<table class="layui-hide" id="tourist" lay-filter="tourist"></table>
+<script type="text/html" id="toolbarDemo">
+    <div class="layui-btn-container">
+        <button class="layui-btn layui-btn-sm" lay-event="delete">批量删除</button>
+        <button class="layui-btn layui-btn-sm" lay-event="refresh">刷新</button>
+        <!--button class="layui-btn layui-btn-sm" lay-event="add">新增</button-->
+    </div>
+</script>
+
+<script type="text/html" id="barDemo">
+    <a class="layui-btn layui-icon layui-icon-edit layui-btn-xs" lay-event="edit">编辑</a>
+    <a class="layui-btn layui-btn-danger layui-btn-xs layui-icon layui-icon-delete" lay-event="del">删除</a>
+</script>
+<!--新增表单 start-->
+<div id="add-main" style="display: none;margin-top: 20px;">
+    <form class="layui-form" id="add-form" action="" lay-filter="add-form">
+        <input type="hidden" name="id" value="0" id="id">  
+ 
+        <div class="layui-form-item">
+            <label class="layui-form-label">用户名</label>
+                <div class="layui-input-block">
+                <input type="text" name="tourist_name" id="tourist_name" lay-verify="required" style="width:90%"
+                       placeholder="用户名"
+                       autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">会员IP</label>
+               <div class="layui-input-block">
+                <input type="text" name="ip" id="ip" style="width:90%"
+                       placeholder="会员IP"
+                       autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">回访次数</label>
+               <div class="layui-input-block">
+                <input type="text" name="times" id="times" style="width:90%"
+                       placeholder="会员IP"
+                       autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label"></label>
+           <div class="layui-input-inline">
+                <button class="layui-btn" lay-submit lay-filter="save">保存</button>
+                <button type="button" class="layui-btn layui-btn-danger" onclick="layer.closeAll()">取消</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+
+<script type="text/html" id="locks">
+        <input type="checkbox" name="locks" lay-skin="switch" lay-filter="i" lay-text="正常|锁定" data-url="{:url('tourist/edit')}?id={{d.id}}" {{d.locks==1?'checked':''}}>
+    </script>
+<script type="text/html" id="switchTpl">
+        <input type="checkbox" name="status" lay-skin="switch" lay-filter="component-form-switchTest" lay-text="在线|离线" data-url="{:url('tourist/edit')}?id={{d.id}}" {{d.status==1?'checked':''}}>
+    </script>
+<!--新增表单 end-->
+<script>
+    layui.use(['table', 'form', 'laydate'], function () {
+        var table = layui.table,
+            laydate = layui.laydate,
+            $ = layui.jquery,
+            form = layui.form;
+        form.render();
+
+        // 搜索 start 引入时间组件laydate---------------------
+        // 时间
+        laydate.render({
+            elem: '#createtime'
+            , range: true
+        });
+
+        //根据搜索条件重加载表格
+        var $ = layui.$, active = {
+            reload: function () {
+                //执行重载
+                table.reload('tourist', {
+                    page: {
+                        curr: 1 //重新从第 1 页开始
+                    }
+                    , where: {
+                        blackid: $('#blackid').val(), // 名字不能和编辑弹框重复
+                        ips: $('#ips').val(), // 名字不能和编辑弹框重复
+                        createtime: $('#createtime').val()
+                    }
+                });
+            }
+        };
+        $('#layui-btn').on('click', function () {
+            var type = $(this).data('type');
+            active[type] ? active[type].call(this) : '';
+        });
+        // 搜索 end-----------------------------------------
+        table.render({
+            elem: '#tourist'
+            , url: '/tourist/info'  // 请求数据路由地址
+            , toolbar: '#toolbarDemo' //开启头部工具栏，并为其绑定左侧模板
+            , defaultToolbar: ['filter', 'exports', 'print', { //自定义头部工具栏右侧图标。如无需自定义，去除该参数即可
+                title: '提示'
+                , layEvent: 'LAYTABLE_TIPS'
+                , icon: 'layui-icon-tips'
+            }]
+            , title: '用户数据表'
+            , cols: [[
+                {type: 'checkbox', fixed: 'left'}
+                , {field: 'id', title: 'ID', width: 70, align: 'center', fixed: 'left',templet: function(d){
+                    return d.id==344?'checked':d.id
+                }}
+                , {field: 'tourist_name', title: '用户名', align: 'center', width: 130, style:'background-color: #eee; color: #000;',templet: function(d){
+                             return '游客：<span style="color: #c00;">'+ d.tourist_name +'</span>';
+                                }}
+                , {field: 'times', title: '次数', align: 'center', width: 70}
+                , {field: 'ip', title: 'IP地址', align: 'center', width: 140}
+                , {field: 'agent', title: '用户代理', align: 'center', width: 150}
+                , {field: 'updatetime', title: '更新时间', align: 'center', width: 160}
+                , {field: 'createtime', title: '创建时间', align: 'center', width: 160}
+                , {field: 'locks', title: '黑名单', align: 'center', width: 100,templet: '#locks'}
+                , {field: 'status', title: '状态', align: 'center', width: 100, templet: '#switchTpl'}
+                , {fixed: 'right', title: '操作', align: 'center', toolbar: '#barDemo', width: 150}
+            ]]
+            , page: true
+            , limit: 10
+            , text: {none: '{:__('No data available')}'}
+         
+        });
+// 通用开关
+form.on('switch(i)', function (data) {
+    var index = layer.msg('修改中，请稍候', {
+        icon: 16,
+        time: false,
+        shade: 0.3,
+        anim: 1
+    });
+    // 参数
+    var obj = {};
+    obj[$(this).attr('name')] = this.checked == true ? 1 : 2;
+    obj['_verify'] = 0;
+    $.ajax({
+        url: $(this).data('url'),
+        type: 'post',
+        dataType:"json",
+        data: obj,
+        success: function (result) {
+            layer.close(index);
+            layer.msg(result.msg, {icon: 1});
+                        location.reload();  // 页面刷新
+        },
+        error: function (xhr, state, errorThrown) {
+            layer.close(index);
+            layer.msg(state + '：' + errorThrown, {icon: 2});
+        }
+    });
+});
+
+/* 监听指定开关 */
+    form.on('switch(component-form-switchTest)', function(data){
+      layer.msg('开关checked：'+ (this.checked ? 'true' : 'false'), {
+        offset: '3px'
+      });
+      layer.tips('温馨提示：您已选择在线|离线开关', data.othis)
+    });
+        //表单提交
+        form.on('submit(save)', function (data) {
+        var index = layer.msg('修改中，请稍候', {
+        icon: 16,
+        time: false,
+        shade: 0.3,
+        anim: 4
+       });
+            params = data.field;
+            submit($, params);
+            return false;
+        });
+
+        // 新增
+        function submit($, params) {
+            var url = params.id > 0 ? '/tourist/edit' : '/tourist/add';
+            $.post(url, params, function (res) {
+                if (res.code == 0) {
+                    layer.msg(res.msg, {icon: 1});
+                    setTimeout(function () {
+                        layer.closeAll();   // 关闭弹窗
+                        location.reload();  // 页面刷新
+                    }, 1500)
+                } else {
+                    layer.msg(res.msg, {icon: 0})
+                }
+            }, 'json');
+        }
+
+        //头工具栏事件
+        table.on('toolbar(tourist)', function (obj) {
+            var checkStatus = table.checkStatus(obj.config.id);
+            switch (obj.event) {
+                case 'add':
+                    // 清空表单
+                    document.getElementById('id').value = 0;
+                    $("#add-form")[0].reset();
+                    layui.form.render();
+                    // 打开窗口
+                    layer.open({  
+                     type: 1 //Page层类型
+                     ,area: ['500px', '300px']
+                     , title: '编辑'
+                     ,shade: 0.3 //遮罩透明度
+                     ,maxmin: true //允许全屏最小化
+                     ,anim: 4 //0-6的动画形式，-1不开启
+                   
+                     , shadeClose: true
+                     , id: 'layui-id' //设定一个id，防止重复弹出
+                     , moveType: 1 //拖拽模式，0或者1
+                     , content: $("#add-main")
+                });
+                    break;
+                case 'delete':
+                    var data = checkStatus.data;
+                    var ids = [];
+                    data.forEach(item => {
+                        ids.push(item.id);
+                    });
+                    if (ids <= 0) {
+                        return layer.msg('请选择删除项！', {icon: 0});
+                    }
+                 var index = layer.msg('提交中，请稍候', {
+                   icon: 16,
+                   time: false,
+                   shade: 0.3,
+                   anim: 4
+                   });
+                    $.post('/tourist/del', {id: ids}, function (res) {
+                        if (res.code == 0) {
+                            layer.msg(res.msg, {icon: 1});
+                            setTimeout(function () {
+                                location.reload();  // 页面刷新
+                            }, 1500)
+                        } else {
+                            layer.msg(res.msg, {icon: 0});
+                        }
+                    }, 'json');
+                    break;
+                case 'refresh':
+                    location.reload();
+                    break;
+            }
+        });
+
+        //监听行工具事件
+        table.on('tool(tourist)', function (obj) {
+            var data = obj.data;
+            //console.log(obj)
+            if (obj.event === 'del') {
+                layer.confirm('真的删除么？', function (index) {
+                 var index = layer.msg('提交中，请稍候', {
+                   icon: 16,
+                   time: false,
+                   shade: 0.3,
+                   anim: 4
+                 });
+                    $.post('/tourist/del', {id: data.id}, function (res) {
+                        if (res.code == 0) {
+                            layer.msg(res.msg, {icon: 1});
+                            setTimeout(function () {
+                                location.reload();  // 页面刷新
+                            }, 1500)
+                        } else {
+                            layer.msg(res.msg, {icon: 0});
+                            layer.close(index);
+                        }
+                    }, 'json')
+                });
+            } else if (obj.event === 'edit') {
+                if (data.length == 0) {
+                    return layer.msg('请选择一行！', {icon: 0});
+                }
+                // 打开窗口
+                  var title = $(this).html();
+                     var width = $(this).data('width');
+                     var height = $(this).data('height');
+                if(navigator.userAgent.match(/(iPhone|iPod|Android|ios)/i)){
+                      var width = '90%';
+                      var height = '300px';
+                     }else{
+                        var width = '500px';
+                      var height = '300px';
+                     };
+                // 打开窗口
+                layer.open({  
+                     type: 1 //Page层类型
+                     ,area: [width, height]
+                     ,title: title 
+                     ,closeBtn: false
+                     ,shade: 0.3 //遮罩透明度
+                     ,maxmin: true //允许全屏最小化
+                     ,anim: 4 //0-6的动画形式，-1不开启
+                     ,shadeClose: true
+                     ,id: 'layui-id' //设定一个id，防止重复弹出
+                     ,moveType: 0 //拖拽模式，0或者1
+                     ,content: $("#add-main")
+                     });
+                document.getElementById('id').value = data.id;
+                document.getElementById('tourist_name').value = data.tourist_name;
+                document.getElementById('ip').value = data.ip;
+                document.getElementById('times').value = data.times;
+                    layui.form.render();
+            }
+        });
+    })
+    ;
+function getCurDate()  
+{  
+ var d = new Date();  
+ var week;  
+ switch (d.getDay()){  
+ case 1: week="星期一"; break;  
+ case 2: week="星期二"; break;  
+ case 3: week="星期三"; break;  
+ case 4: week="星期四"; break;  
+ case 5: week="星期五"; break;  
+ case 6: week="星期六"; break;  
+ default: week="星期天";  
+ }  
+ var years = d.getFullYear();  
+ var month = add_zero(d.getMonth()+1);  
+ var days = add_zero(d.getDate());  
+ var hours = add_zero(d.getHours());  
+ var minutes = add_zero(d.getMinutes());  
+ var seconds=add_zero(d.getSeconds());  
+ var ndate = years+"年"+month+"月"+days+"日 "+hours+":"+minutes+":"+seconds+" "+week;  
+ myTime.innerHTML = ndate;  
+}  
+  
+function add_zero(temp)  
+{  
+ if(temp<10) return "0"+temp;  
+ else return temp;  
+}  
+  
+setInterval("getCurDate()", 100);  
+</script>
+  <hr class="layui-bg-green">
+ <fieldset class="layui-elem-field layui-field-title">
+    <legend>移动设备、平板、桌面端的复杂组合响应式展现,后台框架layui，前端框架bootstrap</legend>
+  </fieldset>
+  <hr class="layui-bg-green">

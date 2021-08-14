@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+{include file="index/common/head"/}
+<head>
+<link href="/static/behand/css/user.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="/static/login.css">
+   <link rel="stylesheet" href="/static/layui/css/layui.css" media="all">
+    <script src="/static/layui/layui.js" charset="utf-8"></script>
+  
+</head>
+<body>
+
+{include file="index/common/header" /}
+
+    
+
+<div class="login-wrapper">
+                <form id="register-form" class="layui-form">
+       <h2><a href="/user/login"><i class="layui-btn layui-btn-fluid" style="width:120px;">{:__('User login')}</i></a>&emsp;&emsp;&emsp;<i>{:__('User registration')}</i></h2>
+       
+                     <input type="hidden" name="openid" value="{$_GET['openid']?:''}" id="openid">
+        <div class="layui-form-item layui-input-icon-group">
+            <i class="layui-icon layui-icon-username"></i>
+            <input class="layui-input" name="username" id="username" placeholder="{:__('enter one user name')}" autocomplete="off"
+                   lay-verType="tips" lay-verify="required" required/>
+        </div>
+        <div class="layui-form-item layui-input-icon-group">
+            <i class="layui-icon layui-icon-password"></i>
+            <input class="layui-input" name="password" id="password" placeholder="{:__('Please enter the login password')}" type="password"
+                   lay-verType="tips" lay-verify="required" required/>
+        </div>
+        {if seo('email')=='1'}
+         <div class="layui-form-item layui-input-icon-group">
+            <i class="layui-icon layui-icon-email"></i>
+            <input type="text" class="layui-input" name="email" id="email" placeholder="{:__('Please input email')}" autocomplete="off"
+                   lay-verType="tips" lay-verify="required" required/>
+        </div>
+        {/if}
+        {if seo('mobile')=='1'}
+        <div class="layui-form-item layui-input-icon-group">
+            <i class="layui-icon layui-icon-cellphone"></i>
+            <input type="text" class="layui-input" name="mobile" id="mobile" placeholder="{:__('Please input mobile phone number')}" autocomplete="off"
+                   lay-verType="tips" lay-verify="required" required/>
+        </div>
+        {/if}
+        {if seo('useryzm')=='1'}
+                <div class="layui-form-item layui-input-icon-group login-captcha-group">
+            <i class="layui-icon layui-icon-auz"></i>
+            <input type="text" class="layui-input" name="captcha" id="captcha" placeholder="{:__('Please enter the verification code')}" autocomplete="off"
+                   lay-verType="tips" lay-verify="required" required/>
+            <img src="{:captcha_src()}" onclick="this.src='{:captcha_src()}?rand='+Math.random()" class="login-captcha" />
+        </div>
+       {/if}
+               
+        <div class="layui-form-item">
+           <input type="button" class="layui-btn-fluid" id='btn' lay-filter="save" lay-submit disabled="disabled" value="{:__('Register now')}">
+        </div>
+        
+    </form>
+</div>  
+</body>
+{include file="index/common/script" /}
+   
+    <script>
+
+   $("input").on("input",function(){
+             var getUsername = $("#username").val();
+             var getMobile = $("#mobile").val();
+             var getPassword = $("#password").val();
+             var getEmail = $("#email").val();
+             var getCaptcha = $("#captcha").val();
+ 
+             $(this).css("color","#232323");
+ 
+             if(getUsername != '' && getMobile != '' && getPassword != '' && getEmail != '' && getCaptcha != ''){
+             $('#btn').attr('disabled', false).css('background','#009688').css('border','none').css('color','#fff');
+               }else{ 
+             $('#btn').attr('disabled', true).css('background','rgba(0,0,0,0.2)').css('border','1px solid #fff').css('color','#999');
+    
+           }
+       });
+     
+    </script>
+<script>
+    layui.use('form', function () {
+        var $ = layui.jquery,
+            form = layui.form;
+        form.render();
+        //表单提交
+        form.on('submit(save)', function (data) {  
+            var index = layer.msg('{:__('Registration, please wait')}', {
+                icon: 16,
+                time: false,
+                shade: 0.3
+            });
+            params = data.field;
+            submit($, params);
+            return false;
+        });
+
+        function submit($, params) {
+            $.post('/user/add', params, function (res) {
+                if (res.code == 0) {
+                    layer.msg(res.msg, {icon: 1});
+                    setTimeout(function () {
+                        window.top.location.href = '/user/login';
+                    }, 1500)
+                } else {
+                    layer.msg(res.msg, {icon: 0})
+                }
+            }, 'json');
+        }
+    })
+</script>
+</html>

@@ -1,0 +1,80 @@
+{extend name="base" /}
+{block name="css"}
+{/block}
+{block name="body"}
+<div class="layui-fluid">
+    <div class="layui-card">
+        <div class="layui-card-header">
+            <div class="layui-inline">
+                <a id="btnAddAuth" class="layui-btn icon-btn ajax-iframe" href="{:url('rule/addrule')}" data-width="400px" data-height="450px"><i class="layui-icon">&#xe654;</i>添加</a>
+            </div>
+        </div>
+        <table id="tableList" lay-filter="tableList"></table>
+    </div>
+</div>
+
+<!-- 表格操作列 -->
+<script type="text/html" id="tableBarAuth">
+    <a class="layui-btn layui-btn-sm ajax-iframe" href="{:url('rule/addrule')}?pid={{d.authorityId}}" data-width="400px" data-height="450px">添加子菜单</a>
+    <a class="layui-btn layui-btn-sm ajax-iframe" href="{:url('rule/editRule')}?id={{d.authorityId}}" data-width="400px" data-height="450px">修改</a>
+    <a class="layui-btn layui-btn-danger layui-btn-sm ajax-delete" href="{:url('rule/delRule')}?id={{d.authorityId}}">删除</a>
+</script>
+<!-- 权限列 -->
+<script type="text/html" id="weigh">
+    <input type="text" name="weigh" value="{{d.orderNumber}}" autocomplete="off" class="layui-input ajax-update" data-url="{:url('rule/editRule')}?id={{d.authorityId}}">
+</script>
+<!-- 权限列 -->
+<script type="text/html" id="status">
+    <input type="checkbox" name="status" lay-skin="switch" lay-filter="*" lay-text="正常|锁定" data-url="{:url('rule/editRule')}?id={{d.authorityId}}" {{d.status==1?'checked':''}}>
+</script>
+{/block}
+{block name="js"}
+<script>
+    layui.use(['layer', 'form', 'admin', 'treeTable', 'util'], function () {
+        var $ = layui.jquery;
+        var layer = layui.layer;
+        var form = layui.form;
+        var admin = layui.admin;
+        var treeTable = layui.treeTable;
+        var util = layui.util;
+
+        // 渲染表格
+        var insTb = treeTable.render({
+            elem: '#tableList',
+            tree: {
+                iconIndex: 1,  // 折叠图标显示在第几列
+                idName: 'authorityId',  // 自定义id字段的名称
+                pidName: 'parentId',  // 自定义标识是否还有子节点的字段名称
+                isPidData: true  // 是否是pid形式数据
+            },
+            cellMinWidth: 100,
+            cols: [
+                {type: 'numbers'},
+                {field: 'authorityName', title: '权限名称', width: 260},
+                {field: 'menuUrl', title: '控制器'},
+                {title: '排序号', align: 'center', width: 100,templet:'#weigh'},
+                {field: 'menuIcon', title: '图标', align: 'center' },
+                {
+                    title: '类型', templet: function (d) {
+                        var strs = [
+                            '<span class="layui-badge layui-badge-green">菜单</span>',
+                            '<span class="layui-badge layui-badge-blue">按钮</span>'
+                        ];
+                        return strs[d.ismenu];
+                    }, align: 'center', width: 100
+                },
+                {align: 'center', width: 100,title: '状态',templet:'#status'},
+                {templet: '#tableBarAuth', title: '操作', align: 'center', width: 250}
+            ],
+        
+            reqData: function (data, callback) {
+                $.get("{:url('rule/rule_json')}", function (res) {
+                   var data = $.parseJSON(res);
+                    //console.log(data.count)
+                    callback(data.data);
+                });
+            }
+        });
+    });
+</script>
+{/block}

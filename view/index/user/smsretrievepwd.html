@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html>
+{include file="index/common/head"/}
+<link href="/static/behand/css/user.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="/static/login.css">
+   
+   <link rel="stylesheet" href="/static/layui/css/layui.css" media="all">
+    <script src="/static/layui/layui.js" charset="utf-8"></script>
+<body>
+
+{include file="index/common/header" /}
+
+              
+<div class="login-wrapper">
+    <form id="mobile-form" class="layui-form" method="POST" action="" onsubmit="return false;">
+        <h2><a href="/user/ems"><i class="layui-btn layui-btn-fluid" style="width:120px;">{:__('Email retrieval')}</i></a>&emsp;&emsp;&emsp;<i>{:__('SMS retrieval')}</i></h2>
+       
+        <input type="hidden" name="uid" value="1" id="uid">
+                <div class="layui-form-item layui-input-icon-group">
+            <i class="layui-icon layui-icon-cellphone"></i>
+            <input class="layui-input" name="mobile" placeholder="{:__('Please input mobile phone number')}" autocomplete="off"
+                   lay-verType="tips" lay-verify="required" required/>
+        </div>
+
+                <div class="layui-form-item layui-input-icon-group login-captcha-group">
+            <i class="layui-icon layui-icon-auz"></i>
+            <input class="layui-input" name="code" placeholder="{:__('Please enter the verification code')}" autocomplete="off" />
+            <botton id="mobiles"lay-filter="retrievemima" lay-submit class="login-captcha" />{:__('Click send')}</botton>
+        </div>
+                <div class="layui-form-item layui-input-icon-group">
+            <i class="layui-icon layui-icon-password"></i>
+            <input class="layui-input" name="password" id="password" placeholder="{:__('Please enter the login password')}" type="password" />
+        </div>
+        
+                
+        <div class="layui-form-item">
+            <button class="layui-btn layui-btn-fluid" lay-filter="retrieve" lay-submit>{:__('Submit for verification')}</button>
+        </div>
+        
+    </form>
+</div> 
+
+<style>
+.notClick{
+height:40px; pointer-events: none
+ } 
+</style>
+</body>
+{include file="index/common/script" /}
+<script>
+    layui.use(['layer', 'form', 'jquery'], function(){
+        var layer = layui.layer,
+            form  = layui.form,
+            $     = layui.jquery;
+form.on('submit(retrievemima)', function (data) {
+                //清空input
+                $("input[name='code']").val("").focus();
+                $("input[name='password']").val("").focus();
+   var index = layer.msg('<i>{:__('Sending, please wait')}</i>', {
+        icon: 16,
+        time: false,
+        shade: 0.3,
+        anim: 1
+    });
+    $.ajax({
+         url: "/user/smspwd",
+        type: data.form.method,
+        dataType: 'json',
+        data: $(data.form).serialize(),
+        success: function (result) {
+            if (result.code === 0) {
+                setTimeout(function () {
+                     if(isNaN(parseInt($("#mobiles").html()))){
+                        var origText  = '60';
+                        var interval = setInterval(function(){
+                            var time = --origText;
+                            if(time <= 0) {
+                                clearInterval(interval);
+                                $('#mobiles').html('{:__('Resend')}').css('border','1px solid #f2f2f2').css('color','#ffffff').css('background','#009688').removeClass("notClick");
+                            }else{
+                                $('#mobiles').html(time+'&nbsp;&nbsp;{:__('second')}').css('border','1px solid #f2f2f2').css('color','#616161').css('background','buttonface').addClass('notClick');
+                            
+                        }
+                        }, 1000);
+                   // parent.location.reload();
+                   }
+                }, 1000);
+
+            layer.close(index);
+            layer.msg(result.msg, {icon: 1});
+            }else{
+                
+            layer.close(index);
+            layer.msg(result.msg, {icon: 2});
+            }
+        },
+    });
+    return false;
+});
+form.on('submit(retrieve)', function (data) {
+    var index = layer.msg('<i>{:__('Verification in progress, please wait')}</i>', {
+        icon: 16,
+        time: false,
+        shade: 0.3,
+        anim: 4
+    });
+
+    $.ajax({
+        url: "/user/mobilecheck",
+        type: data.form.method,
+        dataType: 'json',
+        data: $(data.form).serialize(),
+        success: function (result) {
+            if (result.code === 0) {
+                setTimeout(function () {
+                        location.href = result.url;
+                    //parent.location.reload();
+                }, 1000);
+           
+            layer.close(index);
+            layer.msg(result.msg, {icon: 1});
+            }else{
+                
+            layer.close(index);
+            layer.msg(result.msg, {icon: 2});
+            }
+        },
+    });
+    return false;
+});
+});
+
+</script>
+<!--script>
+    // 获取验证码
+    $(document).on("click", "#mobile", function () {
+        var index = layer.msg('发送中，请稍候', {
+        icon: 16,
+        time: false,
+        shade: 0.3
+    });
+        CMS.api.ajax({
+            url: "/user/smspwd",
+            data: $('#mobile-form').serialize(),
+        }, function (data, ret) { 
+            if (ret.code == 0) {
+                setTimeout(function () {
+                           
+                     if(isNaN(parseInt($("#mobile").html()))){  
+                    
+                        var origText  = '60';
+                        var interval = setInterval(function(){
+                            var time = --origText;
+                            if(time <= 0) {
+                                clearInterval(interval);
+                                $('#mobile').html('重&nbsp;&nbsp;发').css('border','1px solid #f2f2f2').css('color','#ffffff').css('background','#009688').removeClass("notClick");
+                            }else{
+                                $('#mobile').html(time+'&nbsp;&nbsp;秒').css('border','1px solid #f2f2f2').css('color','#616161').css('background','buttonface').addClass('notClick');
+                        }
+                        }, 1000);
+                         }
+
+          
+                },1000)    
+            }
+        });
+    });
+    // 提交验证
+    $(document).on("click", "#mobilecheck", function () {
+        var index = layer.msg('提交中，请稍候', {
+        icon: 16,
+        time: false,
+        shade: 0.3
+    });
+        CMS.api.ajax({
+            url: "/user/mobilecheck",
+            data: $('#mobile-form').serialize(),
+        }, function (data, ret) {
+            if (ret.code == 0) {
+                setTimeout(function () {
+                    location.href = '/user/login';
+                },1000)
+            }
+        });
+    });
+</script-->
+</html>

@@ -1,0 +1,33 @@
+<div class="row">
+    <div class="col-xs-12">
+        <div id="product-focus" class="carousel slide carousel-focus" data-ride="carousel">
+            <ol class="carousel-indicators">
+                {foreach $banner as $vo}
+                <li data-target="#product-focus" data-slide-to="{$vo.id}" class="{if $vo.id==1} active {/if}"></li>
+                {/foreach}
+            </ol>
+            <div class="carousel-inner" role="listbox">
+                {foreach $banner as $vo}
+                <div class="item {if $vo.id==1} active {/if}">
+                    <a href="{$vo.url}">
+                        <div class="carousel-img"
+                             style="background-image:url({$vo.image});"></div>
+                        <div class="carousel-caption hidden-xs">
+                            <h3>{$vo.desc}</h3>
+                        </div>
+                    </a>
+                </div>
+                {/foreach}
+            </div>
+            <a class="left carousel-control" href="#product-focus" role="button" data-slide="prev">
+                <span class="icon-prev fa fa-chevron-left" aria-hidden="true"></span>
+                <span class="sr-only">Previous</span>
+            </a>
+            <a class="right carousel-control" href="#product-focus" role="button" data-slide="next">
+                <span class="icon-next fa fa-chevron-right" aria-hidden="true"></span>
+                <span class="sr-only">Next</span>
+            </a>
+        </div>
+    </div>
+
+</div>

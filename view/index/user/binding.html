@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+{include file="index/common/head"/}
+<head>
+<link href="/static/behand/css/user.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="/static/login.css">
+   <link rel="stylesheet" href="/static/layui/css/layui.css" media="all">
+    <script src="/static/layui/layui.js" charset="utf-8"></script>
+   
+</head>
+<body>
+
+{include file="index/common/header" /}
+
+                
+<div class="login-wrapper">
+    <form name="form" id="login-form" class="layui-form" method="POST" action="{:url('qq/auth')}">
+        <h2>{:__('User binding')}<a href="/user/register?openid=<?php echo base64_encode($openid);?>">&emsp;&emsp;&emsp;<i class="layui-btn layui-btn-fluid" style="width:120px;">{:__('User registration')}</i></a></h2>
+         
+        <div class="layui-form-item">
+            <i>{:__('Hello!')} <font color="#ff0000">{$name}</font> {:__('QQ authorization successful!')}<br /></i>
+        
+         </div>  
+        <div class="layui-form-item login-oauth-group text-center">
+            <span>
+                <img src={$image} style="width: 60px; height: 60px; border:none;border-radius:50px;">
+            </span>
+         </div>  
+        
+                     <input type="hidden" name="openid" value="{$openid}" id="openid">
+        <div class="layui-form-item layui-input-icon-group">
+            <i class="layui-icon layui-icon-username"></i>
+            <input class="layui-input" name="username" id="username" placeholder="{:__('Please input user name / email / mobile number')}" autocomplete="off"
+                   lay-verType="tips" lay-verify="required" required/>
+        </div>
+        <div class="layui-form-item layui-input-icon-group">
+            <i class="layui-icon layui-icon-password"></i>
+            <input class="layui-input" name="password" id="password" placeholder="{:__('Please enter the login password')}" type="password"
+                   lay-verType="tips" lay-verify="required" required/>
+        </div>
+        
+                <div class="layui-form-item layui-input-icon-group login-captcha-group">
+            <i class="layui-icon layui-icon-auz"></i>
+            <input class="layui-input" name="captcha" placeholder="{:__('Please enter the verification code')}" autocomplete="off"
+                   lay-verType="tips" lay-verify="required" required/>
+            <img src="{:captcha_src()}" onclick="this.src='{:captcha_src()}?rand='+Math.random()" class="login-captcha" />
+        </div>
+        <div class="layui-form-item">
+            <input type="submit" class="layui-btn-fluid" id="btn" lay-filter="save" lay-submit disabled="disabled" value="{:__('Sign in now')}">
+        </div>
+    </form>
+</div>  
+ 
+</body>
+{include file="index/common/script" /}
+   <script>
+
+   $("input").on("input",function(){
+             var getUsername = $("#username").val();
+             var getPassword = $("#password").val();
+             var getCaptcha = $("#captcha").val();
+ 
+             $(this).css("color","#232323");
+ 
+             if(getUsername !== '' && getPassword !== '' && getCaptcha !== ''){
+             $('#btn').attr('disabled', false).css('background','#009688').css('border','none').css('color','#fff');
+               }else{ 
+             $('#btn').attr('disabled', true).css('background-color','rgba(0,0,0,0.2)').css('border','1px solid #fff').css('color','#232323');
+    
+           }
+       });
+     
+    </script>
+
+<script>   
+
+ layui.use(['layer', 'form', 'jquery'], function(){
+         var layer = layui.layer,
+            form  = layui.form,
+            $     = layui.jquery;
+       
+   form.on('submit(save)', function (data) {
+    var index = layer.msg('<i>{:__('Binding, please wait')}</i>', {
+        icon: 16,
+        time: false,
+        shade: 0.3,
+        anim: 4
+    });
+
+    $.ajax({
+        url: data.form.action,
+        type: data.form.method,
+        dataType: 'json',
+        data: $(data.form).serialize(),
+        success: function (result) {
+            if (result.code === 1) {
+                setTimeout(function () {
+                        location.href = result.url;
+                    //parent.location.reload();
+                }, 1000);
+           
+            layer.close(index);
+            layer.msg(result.msg, {icon: 1});
+            }else{
+                
+            layer.close(index);
+            layer.msg(result.msg, {icon: 2});
+            }
+        },
+    });
+    return false;
+});
+});
+
+</script>
+
+
+</html>

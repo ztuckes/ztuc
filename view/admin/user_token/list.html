@@ -1,0 +1,201 @@
+{extend name="base" /}
+{block name="body"} 
+<table class="layui-hide" id="usertoken" lay-filter="usertoken"></table>
+
+<script type="text/html" id="toolbarDemo">
+    <div class="layui-btn-container">
+       <!-- <button class="layui-btn layui-btn-sm" lay-event="delete">批量删除</button>-->
+        <button class="layui-btn layui-btn-sm" lay-event="refresh">刷新</button>
+
+    </div>
+</script>
+
+<script type="text/html" id="barDemo">
+
+    <a class="layui-btn layui-btn-danger layui-btn-xs layui-icon layui-icon-delete" lay-event="del">删除</a>
+</script>
+
+
+<!--新增表单 end-->
+{/block}
+
+{block name="js"}
+<script>
+    layui.use(['table', 'form'], function () {
+        var table = layui.table,
+            $ = layui.jquery,
+            form = layui.form;
+        form.render();
+
+        table.render({
+            elem: '#usertoken'
+            , url: '/usertoken/info'  // 请求数据路由地址
+            , toolbar: '#toolbarDemo' //开启头部工具栏，并为其绑定左侧模板
+           
+            ,cellMinWidth: 100
+            ,size:'lg'
+            ,even:true
+            , title: '用户数据表'
+            , cols: [[
+                {type: 'checkbox', fixed: 'left'}
+                , {field: 'user_id', title: '会员ID', width: 60, align: 'center', fixed: 'left'}
+                , {field: 'token', title: 'token令牌', align: 'center', width: 200}
+                , {field: 'createtime', title: '创建时间', align: 'center', width: 160}
+                , {
+                    field: 'expiretime',
+                    title: '过期时间',
+                    align: 'center',
+                    width: 160,
+                    templet: "<div>{{layui.util.toDateString(d.expiretime*1000, 'yyyy-MM-dd HH:mm:ss')}}</div>"
+                }
+                , {fixed: 'right', title: '操作', align: 'center', toolbar: '#barDemo', width: 150}
+            ]]
+            , page: true
+            , limit: 3
+            , text: {none: '{:__('No data available')}'}
+
+        });
+        //表单提交
+        form.on('submit(save)', function (data) {
+        var index = layer.msg('提交中，请稍候', {
+        icon: 16,
+        time: false,
+        shade: 0.3
+    });
+            params = data.field;
+            submit($, params);
+            return false;
+        });
+
+        // 新增
+        function submit($, params) {
+            var url = params.id > 0 ? '/usertoken/edit' : '/usertoken/add';
+            $.post(url, params, function (res) {
+                if (res.code == 0) {
+                    layer.msg(res.msg, {icon: 1});
+                    setTimeout(function () {
+                        layer.closeAll();   // 关闭弹窗
+                        location.reload();  // 页面刷新
+                    }, 1500)
+                } else {
+                    layer.msg(res.msg, {icon: 0})
+                }
+            }, 'json');
+        }
+
+        //头工具栏事件
+        table.on('toolbar(usertoken)', function (obj) {
+            var checkStatus = table.checkStatus(obj.config.id);
+            switch (obj.event) {
+                case 'add':
+                    // 清空表单
+                    document.getElementById('id').value = 0;
+                    $("#add-form")[0].reset();
+                    layui.form.render();
+                    // 打开窗口
+                    layer.open({
+                        type: 1
+                        , title: '新增'
+                        , closeBtn: false
+                       // , area: ['35%', '60%']
+                        , shade: 0
+                        , shadeClose: true
+                        , id: 'layui-id' //设定一个id，防止重复弹出
+                        //,btn: ['保存', '取消']
+                        //,btnAlign: 'c'
+                        , moveType: 1 //拖拽模式，0或者1
+                        , content: $("#add-main")
+                    });
+                    break;
+                case 'delete':
+                    var data = checkStatus.data;
+                    var user_ids = [];
+                    data.forEach(item => {
+                        user_ids.push(item.user_id);
+                    });
+                    if (user_ids <= 0) {
+                        return layer.msg('请选择删除项！', {icon: 0});
+                    }
+                 var index = layer.msg('提交中，请稍候', {
+                   icon: 16,
+                   time: false,
+                   shade: 0.3
+                 });
+                    $.post('/usertoken/del', {user_id: user_ids}, function (res) {
+                        if (res.code == 0) {
+                            layer.msg(res.msg, {icon: 1});
+                            setTimeout(function () {
+                                location.reload();  // 页面刷新
+                            }, 1500)
+                        } else {
+                            layer.msg(res.msg, {icon: 0});
+                        }
+                    }, 'json');
+                    break;
+                case 'refresh':
+                    location.reload();
+                    break;
+            }
+        });
+
+        //监听行工具事件
+        table.on('tool(usertoken)', function (obj) {
+            var data = obj.data;
+            //console.log(obj)
+            if (obj.event === 'del') {
+                layer.confirm('删除将强制下线，确定删除吗？', function (index) {
+                 var index = layer.msg('提交中，请稍候', {
+                   icon: 16,
+                   time: false,
+                   shade: 0.3
+                 });
+                    $.post('/usertoken/del', {user_id: data.user_id}, function (res) {
+                        if (res.code == 0) {
+                            layer.msg(res.msg, {icon: 1});
+                            setTimeout(function () {
+                                location.reload();  // 页面刷新
+                            }, 1500)
+                        } else {
+                            layer.msg(res.msg, {icon: 0});
+                            layer.close(index);
+                        }
+                    }, 'json')
+                });
+            } else if (obj.event === 'edit') {
+                if (data.length == 0) {
+                    return layer.msg('请选择一行！', {icon: 0});
+                }
+               // 打开窗口
+                  var title = $(this).html();
+                     var width = $(this).data('width');
+                     var height = $(this).data('height');
+                if(navigator.userAgent.match(/(iPhone|iPod|Android|ios)/i)){
+                      var width = '90%';
+                      var height = '300px';
+                     }else{
+                        var width = '500px';
+                      var height = '300px';
+                     };
+                // 打开窗口
+                layer.open({  
+                     type: 1 //Page层类型
+                     ,area: [width, height]
+                     ,title: title 
+                     ,closeBtn: false
+                     ,shade: 0.3 //遮罩透明度
+                     ,maxmin: true //允许全屏最小化
+                     ,anim: 4 //0-6的动画形式，-1不开启
+                     ,shadeClose: true
+                     ,id: 'layui-id' //设定一个id，防止重复弹出
+                     ,moveType: 0 //拖拽模式，0或者1
+                     ,content: $("#add-main")
+                     });
+                document.getElementById('user_id').value = data.user_id;
+            }
+        });
+    })
+    ;
+
+
+</script>
+{/block}

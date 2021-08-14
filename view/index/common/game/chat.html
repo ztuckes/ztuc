@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>LayIM客服模式 webim在线演示 - Layui</title>
+
+    <link rel="stylesheet" href="/static/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="/static/layui/css/box.css" media="all">
+    <link rel="stylesheet" href="/static/layui/css/betch.css" media="all">
+    <script src="/static/layui/layui.js" charset="utf-8"></script>
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>LayIM客服模式 webim在线演示 - Layui</title>
+
+    <link rel="stylesheet" href="/static/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="/static/layui/css/box.css" media="all">
+    <link rel="stylesheet" href="/static/layui/css/betch.css" media="all">
+    <script src="/static/layui/layui.js" charset="utf-8"></script>
+
+
+</head>
+<body>
+
+
+
+
+
+
+<script>
+
+    layui.use(['layim'], function(layim){
+
+
+        var socket = new WebSocket('ws://127.0.0.1:2345');
+        socket.onopen = function(){
+            console.log('链接成功！');
+        };
+
+        layim.on('send', function(options){
+            console.log(options);
+            //do something
+        });
+
+        layim.config({
+            init: {
+
+                //配置客户信息
+                mine: {
+                    "username": "访客" //我的昵称
+                    ,"id": "100000123" //我的ID
+                    ,"status": "online" //在线状态 online：在线、hide：隐身
+                    ,"remark": "在深邃的编码世界，做一枚轻盈的纸飞机" //我的签名
+                    ,"avatar": "http://tp4.sinaimg.cn/2145291155/180/5601307179/1" //我的头像
+                }
+            }
+            //开启客服模式
+            ,brief: true
+        });
+
+        //打开一个客服面板
+        layim.chat({
+            name: '在线客服' //名称
+            ,type: 'kefu' //聊天类型
+            ,avatar: 'http://tp4.sinaimg.cn/2145291155/180/5601307179/1' //头像
+            ,id: 1111111 //定义唯一的id方便你处理信息
+        });
+        layim.setChatMin(); //收缩聊天面板
+    });
+
+    layui.use(['code'], function(){
+        layui.code({
+            elem: 'pre'
+        })
+    });
+
+</script>
+
+
+</body>
+</html>
+</head>
+<body>
+
+
+
+
+
+
+<script>
+
+    layui.use(['layim'], function(layim){
+
+
+        var socket = new WebSocket('ws://localhost:2345');
+        socket.onopen = function(){
+            console.log('链接成功！');
+            socket.send('tom');
+        };
+
+
+        socket.onmessage = function (e) {
+            console.log(e.data)
+        }
+
+
+
+        var layim = layui.layim;
+
+        layim.config({
+            init: {
+
+                //配置客户信息
+                mine: {
+                    "username": "访客" //我的昵称
+                    ,"id": "100000123" //我的ID
+                    ,"status": "online" //在线状态 online：在线、hide：隐身
+                    ,"remark": "在深邃的编码世界，做一枚轻盈的纸飞机" //我的签名
+                    ,"avatar": "/upload/404.png" //我的头像
+                }
+            }
+            //开启客服模式
+            ,brief: true
+        });
+
+        //打开一个客服面板
+        layim.chat({
+            name: '在线客服一' //名称
+            ,type: 'kefu' //聊天类型
+            ,avatar: '/upload/404.png' //头像
+            ,id: 1111111 //定义唯一的id方便你处理信息
+        });
+        layim.setChatMin(); //收缩聊天面板
+    });
+
+    layui.use(['code'], function(){
+        layui.code({
+            elem: 'pre'
+        })
+    });
+
+</script>
+
+
+</body>
+</html>

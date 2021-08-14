@@ -1,0 +1,114 @@
+{include file="common/head" /}
+<div class="layui-card">
+    <div class="layui-card-header">{:__('Parameter configuration')}</div>
+    <div class="layui-card-body" pad15>
+        <div class="layui-tab">
+            <ul class="layui-tab-title">
+                <li><a href="/system/sina">{:__('Sina email')}</a></li>
+                <li class="layui-this"><a href="/system/list126">{:__('Box 126')}</a></li>
+                <li><a href="/system/listqq">{:__('Enterprise mailbox')}</a></li>
+                <li><a href="/system/listsms">{:__('Tencent SMS')}</a></li>
+            </ul>
+            <div class="layui-tab-content">
+                <div class="layui-tab-item layui-show">
+                    <form action="/system/list126" class="layui-form" method="post">  
+                    <div class="layui-form-item">
+                <label class="layui-form-label">开关</label>
+                <div class="layui-input-block">
+                    <input type="radio" name="status" value="1" class="layui-input" title="开" {if isset($data.status) and $data.status =='1'}checked{/if}>
+                    <input type="radio" name="status" value="0" class="layui-input" title="关" {if isset($data.status) and $data.status =='0'}checked{/if}>
+                </div>
+              
+            </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label"></label>
+                        <div class="layui-input-inline" style="width: 50%;">
+                            <input type="text" name="host" value="{$data.host|default=''}" class="layui-input">
+                        </div>
+                          <div class="layui-form-mid layui-word-aux">服务器地址一般为smtp.xxxx.com</div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label"></label>
+                        <div class="layui-input-inline" style="width: 50%;">
+                            <input type="text" name="email" value="{$data.email|default=''}" class="layui-input">
+                        </div>
+                        <div class="layui-form-mid layui-word-aux">服务器账号一般为第三方登录名</div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label"></label>
+                        <div class="layui-input-inline" style="width: 50%;">
+                            <input type="text" name="password" value="{$data.password|default=''}" class="layui-input">
+                        </div>
+                          <div class="layui-form-mid layui-word-aux">服务器密码一般为第三方授权码</div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label"></label>
+                        <div class="layui-input-inline" style="width: 50%;">
+                            <input type="text" name="port" value="{$data.port|default=''}" class="layui-input">
+                        </div>
+                        <div class="layui-form-mid layui-word-aux">邮件端口一般为465、25</div>
+                    </div>
+                    <div class="layui-form-item">
+                        <div class="layui-input-block">
+                            <button class="layui-btn" lay-submit  lay-filter="*">确认保存</button>
+                        </div>
+                    </div>
+                    </form>
+                </div>
+                
+            </div>
+            
+        </div>
+        <div class="layui-form" wid100 lay-filter="">
+        
+            
+            
+            
+            
+        
+        </div>
+    </div>
+</div>
+{block name="js"}
+<script src="https://cdn.bootcss.com/jquery/2.2.3/jquery.min.js"></script>
+<script>
+
+    layui.use(['layer', 'form', 'jquery'], function(){
+        var layer = layui.layer,
+            form  = layui.form,
+            $     = layui.jquery;
+// 通用提交
+form.on('submit(*)', function (data) {
+    var index = layer.msg('提交中，请稍候', {
+        icon: 16,
+        time: false,
+        shade: 0.3
+    });
+    $(data.elem).attr('disabled', true);
+    $.ajax({
+        url: data.form.action,
+        type: data.form.method,
+        dataType: 'json',
+        data: $(data.form).serialize(),
+        success: function (result) {
+            if (result.code === 1 && result.url != '') {
+                setTimeout(function () {
+                   // location.href = result.url;
+                    parent.location.reload();
+                }, 1000);
+            } else {
+                $(data.elem).attr('disabled', false);
+            }
+            layer.close(index);
+            layer.msg(result.msg, {icon: 1});
+        },
+        error: function (xhr, state, errorThrown) {
+            layer.close(index);
+            layer.msg(state + '：' + errorThrown, {icon: 2});
+        }
+    });
+    return false;
+});
+});
+</script>
+{/block}

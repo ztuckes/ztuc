@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html>
+{include file="index/common/head"/}
+<body>
+{include file="index/common/header" /}
+<style>
+    .calendar {
+        color: #444;
+        width: 100%;
+        table-layout: fixed;
+    }
+
+    .calendar-title th {
+        font-size: 14px;
+        font-weight: bold;
+        padding: 15px;
+        text-align: center;
+        text-transform: uppercase;
+    }
+
+    .calendar-header th {
+        padding: 10px;
+        text-align: center;
+    }
+
+    .calendar-title th {
+        font-weight: normal;
+    }
+
+    .calendar-title th span {
+        margin: 0 5px;
+        color: #666;
+    }
+
+    .calendar-title th a {
+        margin: 0 5px;
+        color: #666;
+    }
+
+    .calendar tbody tr td {
+        text-align: center;
+        vertical-align: middle;
+        width: 14.28%;
+        height: 60px;
+        line-height: 30px;
+    }
+
+    .calendar tbody tr td.pad {
+        background: rgba(255, 255, 255, 0.1);
+    }
+
+    .calendar tbody tr td.day {
+    }
+
+    .calendar tbody tr td.day div:first-child {
+        display: block;
+        width: 30px;
+        margin: 0 auto;
+        cursor: pointer;
+    }
+
+    .calendar tbody tr td.signed div:first-child {
+        background: #f7b82e;
+        color: #fff;
+        border-radius: 30px;
+    }
+
+    .calendar tbody tr td.today {
+        background: rgba(0, 0, 0, 0.1);
+    }
+
+    .signin-rank-table > tbody > tr > td {
+        vertical-align: middle;
+    }
+</style>
+<div id="content-container" class="container">
+    <div class="row">
+        <div class="col-md-3">
+            {include file="index/common/sidenav" /}
+        </div>
+        <div class="col-md-9">
+            <div class="panel panel-default panel-page">
+                <div class="panel-heading">
+                    <h2>My sign in 
+                        <a class="btn btn-success pull-right btn-signin {$signin?'disabled':''} " href="javascript:;">
+                            <i class="fa fa-location-arrow"></i> <span>{$signin ? __('Signed in') : __('Sign in')}</span>
+                        </a>
+
+                        <a href="javascript:;" class="btn btn-default pull-right btn-rule" style="margin-right:5px;">
+                            <i class="fa fa-question-circle"></i>
+                            {:__('Sign in points rule')}
+                        </a>
+
+                        <a href="javascript:;" class="btn btn-default pull-right btn-rank" style="margin-right:5px;">
+                            <i class="fa fa-trophy"></i>
+                            {:__('Ranking List')}
+                        </a>
+                    </h2>
+                </div>
+                <div class="panel-body" style="padding:0;">
+                    <div class="alert alert-warning-light">
+                        {if $signin}
+                        
+                        <?php echo str_replace(array('%a', '%b'), array('<b style="color: #ff0000;">' . $successions . '</b>', '<b style="color: #ff0000;">' . $score . '</b>'), __('Continue to sign in')); ?>
+
+                        {else /}
+                        <?php echo str_replace('%a', '<b style="color: #ff0000;">' . $score . '</b>', __('Check in today')); ?>
+                        {/if}
+                    </div>
+                    <div class="calendar calendar3"></div>
+                    {$calendar->draw($date)|raw}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{include file="index/common/footer" /}
+
+{include file="index/common/script" /}
+<script>
+    // 签到
+    $(document).on('click', ".btn-signin,.today", function () {
+       var index = layer.msg('<i>{:__('Please wait while we sign in')}</i>', {
+        icon: 16,
+        time: false,
+        shade: 0.3,
+        anim: 1
+    });
+        CMS.api.ajax({
+            url: "/dosign",
+            data: {}
+        }, function (data, ret) {
+            if (ret.code == 1) {
+                setTimeout(function () {
+                    location.reload();
+                }, 1500)
+            }
+        });
+    })
+    // 补签
+    $(document).on('click', ".expired[data-date]:not(.today):not(.signed)", function () {
+        var that = this;
+        layer.confirm("{:__('Confirm the date of supplementary signature')}：" + $(this).data("date") + "？<br>{:__('Additional signature will consume')}" + {$fillupscore} + "{:__('integral')}", function () { var index = layer.msg('<i>{:__('Re signing, please wait')}</i>', {
+        icon: 16,
+        time: false,
+        shade: 0.3,
+        anim: 1
+    });
+            CMS.api.ajax({
+                url: "/signature",
+                data: {date: $(that).data("date")}
+            }, function (data, ret) {
+                if (ret.code == 1) {
+                    setTimeout(function () {
+                        location.reload();
+                    }, 1500)
+                }
+            });
+        })
+
+    })
+    // 签到积分规则
+    $(document).on("click", ".btn-rule", function () {
+        layer.open({
+            title: '{:__('Sign in points rule')}',
+            area: ['30%', '60%'],
+            id: 'layui-id' ,//设定一个id，防止重复弹出,
+            content: '`' +
+                '<table class="table table-striped" style="margin-bottom:0;">\n' +
+                '        <thead>\n' +
+                '        <tr>\n' +
+                '            <th>{:__('Continuous check in days')}</th>\n' +
+                '            <th>{:__('Get points')}</th>\n' +
+                '        </tr>\n' +
+                '        </thead>\n' +
+                '        <tbody>\n' +
+                '        {volist name="signinscore" id="item"}\n' +
+                '        <tr>\n' +
+                '            <th scope="row">第{$key|str_replace=\'s\',\'\',###}天</th>\n' +
+                '            <td>+{$item}</td>\n' +
+                '        </tr>\n' +
+                '        {/volist}\n' +
+                '        </tbody>\n' +
+                '    </table>`',
+            btn: []
+        });
+        return false;
+    });
+
+    // 排行
+    $(document).on("click", ".btn-rank", function () {
+        layer.open({
+            title: '{:__('Ranking List')}',
+            area: ['30%', '60%'],
+            id: 'layui-ids' ,//设定一个id，防止重复弹出,
+            content: '`' +
+                '  <div style="padding:20px;min-height:300px;">\n' +
+                '        <table class="table table-striped table-hover signin-rank-table">\n' +
+                '            <thead>\n' +
+                '            <tr>\n' +
+                '                <th>{:__('head portrait')}</th>\n' +
+                '                <th width="50%">{:__('Nickname?')}</th>\n' +
+                '                <th class="text-center">{:__('Continuous attendance')}</th>\n' +
+                '            </tr>\n' +
+                '            </thead>\n' +
+                '            <tbody>\n' +
+                '            {foreach $rank as $vo}\n' +
+                '            <tr>\n' +
+                '                <td><a href="#"><img src="{$vo.avatar}" height="30" width="30" alt="" class="img-circle"/></a></td>\n' +
+                '                <td><a href="#">{$vo.username}</a></td>\n' +
+                '                <td class="text-center"> {$vo.days}天</td>\n' +
+                '            </tr>\n' +
+                '            {/foreach}\n' +
+                '            </tbody>\n' +
+                '        </table>\n' +
+                '    </div>`',
+            btn: []
+        });
+        return false;
+    });
+
+
+</script>
+</body>
+</html>

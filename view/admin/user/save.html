@@ -1,0 +1,58 @@
+{extend name="base" /}
+{block name="body"}
+<div class="layui-card">
+    <div class="layui-card-body">
+        <form action="" class="layui-form" method="post">
+           
+        <div class="layui-form-item center">
+                <label class="layui-form-label">网站LOGO</label>
+              <div class="layui-input-block">
+                   <span class="layui-upload-list">
+                        <img class="layui-upload-img layui-circle" id="image" src="<?php echo htmlentities((isset($list['url']) && ($list['url'] !== '')?$list['url']:'/upload/404.png')); ?>" width="60" height="60">
+                    </span>
+                    <input type="hidden" name="image" value="" autocomplete="off" placeholder="" class="layui-input">
+                    <button type="button" class="layui-btn ajax-admin-avatar"><i class="fa fa-file-image-o"></i> 选择图片</button>
+                </div>
+            </div>
+            
+            
+            
+            
+     <input type="hidden" name="groups_id" value="{$admin.groups_id}" id="groups_id">  
+        <div class="layui-form-item center">
+            <label class="layui-form-label">{:__('Member')}</label>
+            <div class="layui-input-block">
+                <input type="text" name="username" id="username" value="{$data.username|default=''}" style="width: 95%" lay-verify="required" placeholder="会员名" autocomplete="off" class="layui-input">
+            </div>
+        </div>  
+        <div class="layui-form-item">
+            <label class="layui-form-label">{:__('password')}</label>
+            <div class="layui-input-block">
+                <input type="password" name="password" id="password" lay-verify="password" style="width: 95%" placeholder="请输入密码" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">{:__('Mailbox')}</label>
+           <div class="layui-input-block">
+                <input type="text" placeholder="邮箱" id="email" name="email" value="{$data.email|default=''}" style="width: 95%" lay-verify="email" autocomplete="off"
+                       class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">{:__('phone')}</label>
+             <div class="layui-input-block">
+                <input type="text" name="mobile" id="mobile" value="{$data.mobile|default=''}" style="width: 95%" lay-verify="required"
+                       placeholder="请输入手机号"
+                       autocomplete="off" class="layui-input">
+            </div>
+        </div>
+            <div class="layui-form-item">
+                <div class="layui-input-block">
+                    <button class="layui-btn" lay-filter="i" lay-submit="">保存</button>
+                    <button class="layui-btn layui-btn-primary" type="reset">重置</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{/block}

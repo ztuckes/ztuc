@@ -1,0 +1,300 @@
+{include file="common/head" /}
+<table class="layui-hide" id="banner" lay-filter="banner"></table>
+
+<script type="text/html" id="toolbarDemo">
+    <div class="layui-btn-container">
+        <button class="layui-btn layui-btn-sm" lay-event="delete">{:__('Batch delete')}</button>
+        <button class="layui-btn layui-btn-sm" lay-event="refresh">{:__('Refresh')}</button>
+        <button class="layui-btn layui-btn-sm" lay-event="add">{:__('newly added')}</button>
+    </div>
+</script>
+
+<script type="text/html" id="barDemo">
+    <a class="layui-btn layui-icon layui-icon-edit layui-btn-xs" lay-event="edit">{:__('edit')}</a>
+    <a class="layui-btn layui-btn-danger layui-btn-xs layui-icon layui-icon-delete" lay-event="del">{:__('delete')}</a>
+</script>
+<!--新增表单 start-->
+<div id="add-main" style="display: none;margin-top: 20px;">
+    <form class="layui-form" id="add-form" action="" lay-filter="add-form">
+        <input type="hidden" name="id" value="0" id="id">  
+
+         <div class="layui-form-item center">
+            <label class="layui-form-label">{:__('Carousel map')}</label>
+            <button type="button" class="layui-btn" id="upfile"><i class="layui-icon"></i>{:__('Upload pictures')}</button>
+            <span class="layui-upload-list">
+                <img class="layui-upload-img layui-circle" id="image" width="60" height="60">
+             <p id="imageText"></p>
+            </span>
+            <input type="hidden" name="image" value="">
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">{:__('describe')}</label>
+            <div class="layui-input-block">
+                <input type="text" name="desc" id="desc" style="width: 80%" lay-verify="required"
+                       placeholder="{:__('describe')}"
+                       autocomplete="off" class="layui-input">
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">{:__('Jump link')}</label>
+            <div class="layui-input-block">
+                <input type="text" name="url" id="url" style="width: 80%" value="#"
+                       placeholder="{:__('Jump link')}"
+                       autocomplete="off" class="layui-input">
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">{:__('sort')}</label>
+            <div class="layui-input-block">
+                <input type="text" name="weigh" id="weigh" style="width: 80%" value="0" placeholder="{:__('Please input sort')}"
+                       autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">{:__('state')}</label>
+            <div class="layui-input-block">
+                <input type="radio" name="status" value="1" title="正常" checked>
+                <input type="radio" name="status" value="0" title="禁用">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label"></label>
+            <div class="layui-input-block">
+                <button class="layui-btn" lay-submit lay-filter="save">{:__('preservation')}</button>
+                <button type="button" class="layui-btn layui-btn-danger" onclick="layer.closeAll()">{:__('cancel')}</button>
+            </div>
+        </div>
+    </form>
+</div>
+<script type="text/html" id="img">
+    <div><img src="{{ d.image }}" style="width: 100px; height: 50px;"></div>
+</script>
+<!--新增表单 end-->
+<script>
+    layui.use(['table', 'form','upload'], function () {
+        var table = layui.table,
+            $ = layui.jquery,
+            upload = layui.upload,
+            form = layui.form;
+        form.render();
+
+        //普通图片上传
+        var uploadInst = upload.render({
+            elem: '#upfile',
+            exts: 'jpg|png|jpeg|gif',
+            size: 2048,
+            url: '/banner/upload' //改成您自己的上传接口
+            , before: function (obj) {
+                //预读本地文件示例，不支持ie8
+                obj.preview(function (index, file, result) {
+                    console.log(file.name)
+                    $('#image').attr('src', result); //图片链接（base64）
+                });
+            }
+            , done: function (res) {
+                if (res.code == 0){
+                    //上传成功
+                    $('input[name="image"]').val(res.data);
+                    layer.msg(res.msg,{icon: 1})
+                } else {
+                    layer.msg(res.msg,{icon: 0})
+                }
+            }
+            , error: function () {
+                //演示失败状态，并实现重传
+                var demoText = $('#imageText');
+                demoText.html('<span style="color: #FF5722;">{:__('Upload failed')}</span> <a class="layui-btn layui-btn-xs demo-reload">{:__('retry')}</a>');
+                demoText.find('.demo-reload').on('click', function () {
+                    uploadInst.upload();
+                });
+            }
+        });
+
+        table.render({
+            elem: '#banner'
+            , url: '/banner/info'  // 请求数据路由地址
+            , toolbar: '#toolbarDemo' //开启头部工具栏，并为其绑定左侧模板
+            , defaultToolbar: ['filter', 'exports', 'print', { //自定义头部工具栏右侧图标。如无需自定义，去除该参数即可
+                title: '提示'
+                , layEvent: 'LAYTABLE_TIPS'
+                , icon: 'layui-icon-tips'
+            }]
+            , title: '{:__('User data table')}'
+            , cols: [[
+                {type: 'checkbox', fixed: 'left'}
+                , {field: 'id', title: 'ID', width: 80, align: 'center', fixed: 'left'}
+                , {field: 'image', title: '图片', align: 'center', width: 300,templet:'#img'}
+                , {field: 'desc', title: '描述', align: 'center', width: 300}
+                , {field: 'url', title: '跳转链接', align: 'center', width: 120}
+                , {field: 'weigh', title: '排序', align: 'center', width: 120,sort : true}
+                , {field: 'createtime', title: '添加时间', align: 'center', width: 120}
+                , {field: 'status', title: '状态', align: 'center', width: 80,templet:function (d) {
+                        return  d.status ? ' <i class="layui-icon layui-icon-ok-circle" style="font-size: 25px; color: #009688;"></i>' : '<i class="layui-icon layui-icon-close-fill" style="font-size: 25px; color: #FF5722;"></i>';
+                    }}
+                , {fixed: 'right', title: '操作', align: 'center', toolbar: '#barDemo', width: 150}
+            ]]
+            , page: true
+            , limit: 10
+            , text: {none: '{:__('No data available')}'}
+        });
+        //表单提交
+        form.on('submit(save)', function (data) {
+        var index = layer.msg('{:__('Submitting, please wait')}', {
+        icon: 16,
+        time: false,
+        shade: 0.3
+    });
+            params = data.field;
+            submit($, params);
+            return false;
+        });
+
+        // 新增
+        function submit($, params) {
+            var url = params.id > 0 ? '/banner/edit' : '/banner/add';
+            $.post(url, params, function (res) {
+                if (res.code == 0) {
+                    layer.msg(res.msg, {icon: 1});
+                    setTimeout(function () {
+                        layer.closeAll();   // 关闭弹窗
+                        location.reload();  // 页面刷新
+                    }, 1500)
+                } else {
+                    layer.msg(res.msg, {icon: 0})
+                }
+            }, 'json');
+        }
+
+        //头工具栏事件
+        table.on('toolbar(banner)', function (obj) {
+            var checkStatus = table.checkStatus(obj.config.id);
+            switch (obj.event) {
+                case 'add':
+                    // 清空表单
+                    document.getElementById('id').value = 0;
+                    $('#image').attr('src', null);
+                    $("#add-form")[0].reset();
+                    layui.form.render();
+                    // 打开窗口
+                  var title = $(this).html();
+                     var width = $(this).data('width');
+                     var height = $(this).data('height');
+                if(navigator.userAgent.match(/(iPhone|iPod|Android|ios)/i)){
+                      var width = '90%';
+                      var height = '460px';
+                     }else{
+                        var width = '500px';
+                      var height = '460px';
+                     };
+                // 打开窗口
+                layer.open({  
+                     type: 1 //Page层类型
+                     ,area: [width, height]
+                     ,title: title 
+                     ,closeBtn: false
+                     ,shade: 0.3 //遮罩透明度
+                     ,maxmin: true //允许全屏最小化
+                     ,anim: 1 //0-6的动画形式，-1不开启
+                     ,shadeClose: true
+                     ,id: 'layui-id' //设定一个id，防止重复弹出
+                     ,moveType: 0 //拖拽模式，0或者1
+                     ,content: $("#add-main")
+                     });
+                    break;
+                case 'delete':
+                    var data = checkStatus.data;
+                    var ids = [];
+                    data.forEach(item => {
+                        ids.push(item.id);
+                    });
+                    if (ids <= 0) {
+                        return layer.msg('{:__('Please select Delete item')}', {icon: 0});
+                    }
+                 var index = layer.msg('{:__('Submitting, please wait')}', {
+                   icon: 16,
+                   time: false,
+                   shade: 0.3
+                 });
+                    $.post('/banner/del', {id: ids}, function (res) {
+                        if (res.code == 0) {
+                            layer.msg(res.msg, {icon: 1});
+                            setTimeout(function () {
+                                location.reload();  // 页面刷新
+                            }, 1500)
+                        } else {
+                            layer.msg(res.msg, {icon: 0});
+                        }
+                    }, 'json');
+                    break;
+                case 'refresh':
+                    location.reload();
+                    break;
+            }
+        });
+
+        //监听行工具事件
+        table.on('tool(banner)', function (obj) {
+            var data = obj.data;
+            //console.log(obj)
+            if (obj.event === 'del') {
+                layer.confirm('{:__('Really delete it')}', function (index) {
+                 
+                 var index = layer.msg('{:__('Submitting, please wait')}', {
+                   icon: 16,
+                   time: false,
+                   shade: 0.3
+                 });
+                    $.post('/banner/del', {id: data.id}, function (res) {
+                        if (res.code == 0) {
+                            layer.msg(res.msg, {icon: 1});
+                            setTimeout(function () {
+                                location.reload();  // 页面刷新
+                            }, 1500)
+                        } else {
+                            layer.msg(res.msg, {icon: 0});
+                            layer.close(index);
+                        }
+                    }, 'json')
+                });
+            } else if (obj.event === 'edit') {
+                if (data.length==0){
+                    return layer.msg('{:__('Please select a line')}', {icon: 0});
+                }
+                // 打开窗口
+                  var title = $(this).html();
+                     var width = $(this).data('width');
+                     var height = $(this).data('height');
+                if(navigator.userAgent.match(/(iPhone|iPod|Android|ios)/i)){
+                      var width = '90%';
+                      var height = '460px';
+                     }else{
+                        var width = '500px';
+                      var height = '460px';
+                     };
+                // 打开窗口
+                layer.open({  
+                     type: 1 //Page层类型
+                     ,area: [width, height]
+                     ,title: title 
+                     ,closeBtn: false
+                     ,shade: 0.3 //遮罩透明度
+                     ,maxmin: true //允许全屏最小化
+                     ,anim: 4 //0-6的动画形式，-1不开启
+                     ,shadeClose: true
+                     ,id: 'layui-id' //设定一个id，防止重复弹出
+                     ,moveType: 0 //拖拽模式，0或者1
+                     ,content: $("#add-main")
+                     });
+                document.getElementById('id').value = data.id;
+                document.getElementById('url').value = data.url;
+                document.getElementById('desc').value = data.desc;
+                $('#image').attr('src', data.image);
+            }
+        });
+    })
+    ;
+
+
+</script>

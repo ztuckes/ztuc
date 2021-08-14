@@ -1,0 +1,27 @@
+
+<div class="layui-side layui-side-menu">
+        <div class="layui-side-scroll">
+          
+            <ul class="layui-nav layui-nav-tree arrow2" lay-shrink="all" lay-filter="admin-side-nav" lay-accordion="true"> 
+            <li class="layui-nav-item">
+                    <a lay-href="/admin/home"><i class="layui-icon layui-icon-home"></i>&emsp;<cite>控制台</cite></a>
+                </li>
+               {volist name="menus" id="vo"}
+                <li class="layui-nav-item">
+                    <a {if isset($vo['children'])}href="javascript:;"{else}lay-href="{:url($vo.url)}"{/if}><i class="layui-icon {$vo.icon}"></i>&emsp;<cite>{$vo.name}</cite></a>
+                    {if isset($vo['children'])}
+                    <dl class="layui-nav-child">
+                       {volist name="vo['children']" id="v"}
+                        <dd>
+                            <a lay-href="{:url($v.url)}">{$v.name}</a>
+                            
+                           
+                        </dd>
+                        {/volist}
+                    </dl>
+                    {/if}
+                </li>
+                {/volist}
+            </ul>
+        </div>
+    </div>

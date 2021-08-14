@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>
+<html class="lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>
+<html class="lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>
+<html class="lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!-->
+<html class=""> <!--<![endif]-->
+{include file="index/common/head"/}
+<body class="group-page">
+
+{include file="index/common/header" /}
+
+
+<style>
+    .swiper-container {
+        width: 100%;
+        height: 300px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .swiper-slide {
+        background-size: cover;
+        background-position: center;
+    }
+
+    .gallery-top {
+        height: 80%;
+        width: 100%;
+    }
+
+    .gallery-thumbs {
+        height: 20%;
+        box-sizing: border-box;
+        padding: 10px 0;
+    }
+
+    .gallery-thumbs .swiper-slide {
+        width: 25%;
+        height: 100%;
+        opacity: 0.4;
+    }
+
+    .gallery-thumbs .swiper-slide-thumb-active {
+        opacity: 1;
+    }
+
+    .article-image {
+        height: 820px;
+    }
+
+    @media (max-width: 767px) {
+
+        .article-image {
+            height: 400px;
+        }
+    }
+
+</style>
+<div class="container" id="content-container">
+
+    <div class="row">
+
+        <main class="col-xs-12">
+  <!--判断是否有子级或高亮当前栏目-->
+            
+      
+            <div class="panel panel-default article-content">
+                <div class="panel-heading">
+                    <ol class="breadcrumb">
+                        <!-- S 面包屑导航 -->
+                       <?php if(is_numeric($_GET['ZcT'])){
+           
+           // 加密
+        $_GET['ZcT'] = base64_encode($_GET['ZcT']);
+         }else{
+          
+          $_GET['ZcT'] = $_GET['ZcT'];
+      
+      }
+      ?>
+                        <li><a href="/">{:__('home page')}</a></li>
+                        <li> <a href="/column?ZcT={$_GET['ZcT']}">{$article['cat_id'] == 1 ? '笑话故事' : ($article['cat_id'] == 2 ? '人生折理' : ($article['cat_id'] == 3 ? '励志文章' :  ($article['cat_id'] == 4 ? '经典语句' :   ($article['cat_id'] == 5 ? '心情随笔' : ($article['cat_id'] == 6 ? '散文精选' :   ($article['cat_id'] == 7 ? '杂文小记' : ($article['cat_id'] == 9 ? '爱情文章' : ($article['cat_id'] == 15 ? '经典文章' : ($article['cat_id'] == 11 ? '校园文章' : ($article['cat_id'] == 10 ? '亲情文章' : ($article['cat_id'] == 12 ? '友情文章' : ($article['cat_id'] == 14 ? '英语文章' : '经典游戏'))))))))))))}</a></li>
+                        <!-- E 面包屑导航 -->
+                    </ol>
+                </div>
+                <div class="panel-body">
+                    <div class="article-metas">
+                        <h1 class="metas-title">
+                            {:html_entity_decode($article.title)}</h1>
+                        <!-- S 统计信息 -->
+                        <div class="metas-body">
+                            <span class="views-num">
+                                <i class="fa fa-eye"></i> {$article.view} {:__('read')}
+                            </span>
+                            <span class="comment-num">
+                                <i class="fa fa-comments"></i> {$count} {:__('comment')}
+                            </span>
+                            <span class="like-num">
+                                <i class="fa fa-thumbs-o-up"></i>
+                                <span class="js-like-num"> {$article.click} {:__('give the thumbs-up')}
+                                </span>
+                            </span>
+                        </div>
+                        <!-- E 统计信息 -->
+                    </div>
+                  <style>
+                  .w3cschool{letter-spacing:3px;line-height:18px;}
+                   </style>
+                    <div class="article-text w3cschool">
+                        
+                        <!-- S 正文 -->
+                    
+                       {:html_entity_decode($article.content)}
+                      
+                        
+                        <!-- E 正文 -->
+                   
+                     </div>
+                     <!-- S 付费阅读 -->
+                    <!-- E 付费阅读 -->
+                        <div class="article-donate">
+                    
+                       <a href="javascript:" class="btn btn-primary btn-likes btn-lg {$clickLog?'disabled':''} " data-action="vote"
+                           data-type="like" data-id="{$article.id}" data-tag="archives">
+                          <i class="fa fa-thumbs-up"></i>{$clickLog ? __('Yes').'(<span>'.$article.click.'</span>) <i>还有 <span id="hideD"><strong id="RemainD"></strong></span><span id="hideH"><strong id="RemainH"></strong><b>:</b></span><span id="hideM"><strong id="RemainM"></strong><b> : </b></span><span id="hideS"><strong id="RemainS"></strong></span>秒可点赞</i>' : __('give the thumbs-up').'(<span>'.$article.click.'</span>)'}</a>
+                          
+                        <!--<a href="javascript:" class="btn btn-outline-primary btn-donate btn-lg" data-action="donate" data-id="36"><i class="fa fa-cny"></i> 打赏</a>-->
+                    </div>
+                     <ul>
+                            <!-- S 归档 -->
+                            <!--li>本文标签：
+                                <?php
+                                $word = explode('，',$article['keyword']);
+                                foreach($word as $val){
+                                ?>
+                                <a href="javascript:" class="tag" rel="tag"><?php echo $val;?></a>
+                                <?php } ?>
+                            </li-->
+                            <li>浏览次数：<span>{$article.view}</span> 次浏览</li>
+                            <li>发布日期：<?php echo htmlentities(time_trans($article['createtime'])); ?></li>
+                            <li>
+                                 {if $article['id'] == $max}
+                                {:__('Last')}:暂无数据<br>
+                                {if isset($mins['id'])}
+                                {:__('Next')}:<a href="/detail?Art=<?php echo base64_encode($mins['id']?:'');?>&ZcT={$_GET['ZcT']}">{$mins['title']}</a>
+                                {else/}
+                                   {:__('Next')}:暂无数据<br>
+                                {/if}
+                                {elseif $article['id']== $min}
+
+                                {:__('Last')}:<a href="/detail?Art=<?php echo base64_encode($maxs['id']?:'');?>&ZcT={$_GET['ZcT']}">{$maxs['title']}</a> 
+                                {:__('Next')}:暂无数据<br>
+                                {else/}
+                                {:__('Last')}:<a href="/detail?Art=<?php echo base64_encode($maxs['id']?:'');?>&ZcT={$_GET['ZcT']}">{$maxs['title']}</a><br>
+                                 {:__('Next')}:<a href="/detail?Art=<?php echo base64_encode($mins['id']?:'');?>&ZcT={$_GET['ZcT']}">{$mins['title']}</a>
+                                {/if}
+                                 </li>
+                            </li>
+                            <!-- S 归档 -->
+                        </ul>
+
+                    </div>
+
+                    <div class="article-action-btn">
+                        <div class="pull-left">
+                            <!-- S 收藏 -->
+                            <a class="product-favorite addbookbark mr-2" href="javascript:;">
+                                <i class="fa fa-heart"></i> 收藏 </a>
+                            <!-- E 收藏 -->
+                            <!-- S 分享 -->
+                            <span class="bdsharebuttonbox share-box bdshare-button-style0-16">
+                            <a class="bds_more share-box-a" data-cmd="more">
+                                <i class="fa fa-share"></i> 分享                            </a>
+                        </span>
+                            <!-- E 分享 -->
+                        </div>
+                        <div class="pull-right">
+                        </div>
+                        <div class="clearfix"></div>
+                    </div>
+
+                    <!--<div class="related-article">
+                        <div class="row">
+                            &lt;!&ndash; S 相关文章 &ndash;&gt;
+
+                            &lt;!&ndash; E 相关文章 &ndash;&gt;
+                        </div>
+                    </div>-->
+
+                    <div class="clearfix"></div>
+                </div>
+            </div>
+
+            <div class="panel panel-default" id="comments">
+                <div class="panel-heading">
+                    <h3 class="panel-title">{:__('Comment list')}
+                        <small><?php echo str_replace('%a', '<b style="color: #ff0000;">' . $count . '</b>', __('Total chat comments')); ?></small>
+                    </h3>
+                </div>
+                <div class="panel-body">
+                    <div id="comment-container">
+                        <!-- S 评论列表 -->
+                        <div id="commentlist">
+                           {foreach $comment as $vo}
+                            <dl>
+                                <dt><a href="#" target="_blank"><img src='{$vo.avatar}'/></a></dt>
+                                <dd>
+                                    <div class="parent">
+                                        <cite><a href="/user/index">{$vo.username ?: '游客'}</a></cite>
+                                        <?php echo htmlentities(time_trans($vo['createtime'])); ?>
+                           <?php if(isset($user['id'])): ?>  
+                              {if $vo.user_id == $user.id}
+                                       {else/}
+                                       <small> <a href="javascript:;" uid="{$vo.user_id}" pid="{$vo.id}" title="你好！{$vo.username}！" class="reply">回复TA</a></small>
+                                       {/if}
+                                 <?php else: ?>
+                                       <small> <a href="javascript:;" pid="{$vo.id}" title="登录后再发表评论" class="reply">回复TA</a></small>
+                                <?php endif; ?>
+                                          
+                                        <p><i style="color:#ff0000;">主题：</i>{:html_entity_decode($vo['content'])}</p>
+                                       </div> 
+                        <hr class="layui-bg-green">
+                                        {if (!empty($reply))} 
+                                    {foreach $reply as $key => $val}
+                                    
+                                          {if ($vo.id == $val['pid'])}
+                                    <div class="parent"> 
+                                    <p>&emsp;&emsp;<a href="/user/index">{$val['username']}</a>: {:html_entity_decode($val.content)}&emsp;<?php echo htmlentities(time_trans($val['createtime'])); ?>
+                                     <?php if(isset($user['id'])): ?>
+                                       {if $user.id == $val.user_id}
+                                        {else/}
+                                     <small> <a href="javascript:;" uid="{$val.user_id}" pid="{$vo.id}" title="你好！{$val.username}！" class="reply">回复TA</a></small>
+                                     {/if}
+                                     <?php else: ?>
+                                     <small> <a href="javascript:;" pid="{$vo.id}" title="登录后再发表评论" class="reply">回复TA</a></small>
+                                     <?php endif; ?> 
+                                     </p>
+                                    </div> 
+                  
+                                        {/if}
+                                     {/foreach}
+                                        {/if}
+                                </dd>
+                                <div class="clearfix"></div>
+                            </dl>
+                            {/foreach}
+                        </div>
+
+                       
+                        <!-- E 评论列表 -->
+
+                        <!-- S 评论分页 -->
+                        <div id="commentpager" class="text-center">
+                            {$comment|raw}
+                        </div>
+                        <!-- E 评论分页 -->
+
+                        <!-- S 发表评论 -->
+                        <div id="postcomment">
+                            <h3>发表评论 <a href="javascript:;">
+                                <small>取消回复</small>
+                            </a></h3>
+                            <form action="" method="post" id="postform" {if $user} onclick="return false"{/if} />
+                                <input type="hidden" name="article_id" id="article_id" value="{$article.id}"/>
+
+                                <input type="hidden" name="pid" id="pid" value=""/>
+                                <input type="hidden" name="pid_id" id="pid_id" value=""/>
+                                <input type="hidden" name="uid" id="uid" value=""/>
+                                <div class="form-group">
+                                    <textarea name="content" maxlength="199" id="commentcontent" cols="6" rows="5" class="form-control" {if !$user} placeholder='登录后再发表评论' disabled {else/} placeholder='发表评论' {/if}></textarea>
+                                </div>
+                                {if $user}
+                                <div class="form-group">
+                                    <button href="javascript:;" class="btn btn-primary" id="btn-notice" disabled="disabled">{:__('determine')}</button>
+                                    <button type="reset" class="btn btn-outline-primary" onclick="ClearTextArea()">{:__('Refill')}</button>
+                                </div>
+                                {else/}
+                                <div class="form-group">
+                                    <a href="/user/login" class="btn btn-primary">{:__('Sign in now')}</a>
+                                    <a href="/user/register" class="btn btn-outline-primary">{:__('Register now')}</a>
+                                </div>
+                                {/if}
+                            </form>
+                        </div>
+                        <!-- E 发表评论 -->
+                    </div>
+                </div>
+            </div>
+
+        </main>
+
+    </div>
+</div>
+
+{include file="index/common/footer" /}
+{include file="index/common/script" /}
+  <script>
+
+   $("textarea").on("input",function(){
+             var getContent = $("#commentcontent").val();
+ 
+             $(this).css("color","#232323");
+ 
+             if(getContent != ''){
+               $('#btn-notice').attr('disabled', false).css('background','#009688').css('border','none').css('color','#fff');
+               }else{ 
+             $('#btn-notice').attr('disabled', true).css('background','rgba(0,0,0,0.2)').css('border','1px solid #fff').css('color','#232323');
+    
+           }
+       });
+     
+    </script>
+<script>
+    //重置
+    function ClearTextArea()
+       {
+        document.getElementById("commentcontent").value="";
+       }
+    // 点赞
+    $(document).on("click", ".btn-likes", function () {
+                
+       var index = layer.msg('<i>{:__('Submitting, please wait')}</i>', {
+        icon: 16,
+        time: false,
+        shade: 0.3,
+        anim: 4
+    });
+        var that = this;
+        CMS.api.ajax({
+            url: "/click",
+            data: {id: $(that).data("id")}
+        }, function (data, ret) {
+         if (ret.code==1){
+                setTimeout(function () {
+                    location.reload();
+                },1500)
+            }
+        });
+    });
+    // 评论
+    $(document).on("click", "#btn-notice", function () {
+               
+       var index = layer.msg('<i>{:__('Submitting, please wait')}</i>', {
+        icon: 16,
+        time: false,
+        shade: 0.3,
+        anim: 1
+    });
+        var article_id = document.getElementById("article_id").value;
+        var content = document.getElementById("commentcontent").value;
+        var pid = document.getElementById("pid").value;
+        var uid = document.getElementById("uid").value;
+        var pid_id = document.getElementById("pid_id").value;
+        CMS.api.ajax({
+            url: "/notices",
+          dataType: "json",
+            data: {article_id:article_id,content:content,pid:pid,uid:uid,pid_id:pid_id}
+        }, function (data, ret) {
+            if (ret.code==1){
+                setTimeout(function () {
+       
+                     if(isNaN(parseInt($("#btn-notice").html()))){  
+                    
+                        var origText  = 5;
+                        var interval = setInterval(function(){
+                            var time = --origText;
+                            if(time <= 0) {
+                                clearInterval(interval);
+                               location.reload();
+                            }else{
+                                $('#btn-notice').html(time+'{:__('second')}').css('border','none').css('color','#616161').css('background','buttonface').attr("disabled","true");
+                            
+                        }
+                        }, 1000);
+                         }
+
+                    //location.reload();
+                },1500)
+            }
+        });
+    });
+
+</script>
+<script language="JavaScript">
+    var runtimes = 0;
+    function GetRTime(){
+        var nMS = <?php echo $overtime; ?>*1000-runtimes*1000;
+ 
+        if (nMS>=0){
+            var nD=Math.floor(nMS/(1000*60*60*24))%24;
+            var nH=Math.floor(nMS/(1000*60*60))%24;
+            var nM=Math.floor(nMS/(1000*60)) % 60;
+            var nS=Math.floor(nMS/1000) % 60;
+            document.getElementById("RemainD").innerHTML=nD;
+            document.getElementById("RemainH").innerHTML=nH < 10 ? "0" + nH : nH;
+            document.getElementById("RemainM").innerHTML=nM < 10 ? "0" + nM : nM;
+            document.getElementById("RemainS").innerHTML=nS < 10 ? "0" + nS : nS;
+            runtimes++;
+            if(nD==0){
+                //天数0 隐藏天数
+                document.getElementById("hideD").style.display="none";
+                if(nH==0){
+                    //数0 隐藏天数
+                    document.getElementById("hideH").style.display="none";
+                    if(nM==0){
+                        document.getElementById("hideM").style.display="none";
+                        if(nS==0){
+                            //alert("倒计时完毕");
+                    location.reload();
+                        }
+                    }
+                }
+            }
+            setTimeout("GetRTime()",1000);
+        }
+    }
+    window.onload = function() {
+        GetRTime();
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>系统设置</title>
+  {include file="common/head" /}
+</head>
+<body>
+
+<!--新增表单 start-->
+<div id="content-container" class="container">
+    <div class="row">
+        <div class="col-md-3">
+        </div>
+        <div class="col-md-9">
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <h1 class="page-header">系统设置</h1>
+                    <form action="/system/sitting" class="layui-form" method="post">  
+           
+  <div class="layui-form-item center">
+            <label class="layui-form-label">LOGO 1</label>
+              
+                    <button type="button" class="layui-btn ajax-admin-avatar"><i class="layui-icon"></i> 选择图片</button>
+                    <span class="layui-upload-list" style="margin-left: 30px;">
+                        <img class="layui-upload-img" id="logo" width="200" height="60" src="{$model.logo|default=''}">
+                    </span>
+                    <input type="hidden" name="logo" value="{$model.logo|default=''}">
+                
+            </div>
+  <div class="layui-form-item center">
+            <label class="layui-form-label">LOGO 2</label>
+            <button type="button" class="layui-btn" id="upfile"><i class="layui-icon"></i>上传图片</button>
+            <span class="layui-upload-list" style="margin-left: 30px;">
+                <img class="layui-upload-img" id="image" width="200" height="60" src="{$model.image|default=''}">
+                <p id="imageText"></p>
+            </span>
+            <input type="hidden" name="image" value="{$model.image|default=''}">
+        </div>
+
+       <div class="layui-form-item layui-form-text">
+            <label class="layui-form-label">网站标题</label>
+            <div class="layui-input-block">
+                <input type="text" name="title" id="title" value="{$model.title|default=''}" lay-verify="required"
+                       placeholder="网站标题" autocomplete="off" class="layui-input">
+            </div>
+        </div>  
+
+       <div class="layui-form-item layui-form-text">
+            <label class="layui-form-label">欢迎词语</label>
+            <div class="layui-input-block">
+                <input type="text" name="welcomespeech" id="welcomespeech" value="{$model.welcomespeech|default=''}" lay-verify="required"
+                       placeholder="欢迎词语" autocomplete="off" class="layui-input">
+            </div>
+        </div>  
+        
+       <div class="layui-form-item layui-form-text">
+            <label class="layui-form-label">网站链接</label>
+            <div class="layui-input-block">
+                <input type="text" id="url" name="url" value="{$model.url|default=''}" lay-verify="required" placeholder="网站链接" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+       <div class="layui-form-item">
+            <label class="layui-form-label" style="width: 100px">后台验证码</label>
+            <div class="layui-input-block">
+                    <input type="radio" name="adminyzm" value="1" class="layui-input" title="是" {if isset($model.adminyzm) and $model.adminyzm == 1}checked{/if}>
+                <input type="radio" name="adminyzm" value="0" class="layui-input" title="否" {if isset($model.adminyzm) and $model.adminyzm == 0}checked{/if}>
+            </div>
+        </div>
+       <div class="layui-form-item">
+            <label class="layui-form-label" style="width: 100px">后台身份验证</label>
+            <div class="layui-input-block">
+                    <input type="radio" name="adminauth" value="1" class="layui-input" title="是" {if isset($model.adminauth) and $model.adminauth == 1}checked{/if}>
+                <input type="radio" name="adminauth" value="0" class="layui-input" title="否" {if isset($model.adminauth) and $model.adminauth == 0}checked{/if}>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label" style="width: 100px">前台验证码</label>
+            <div class="layui-input-block">
+                    <input type="radio" name="useryzm" value="1" class="layui-input" title="是" {if isset($model.useryzm) and $model.useryzm == 1}checked{/if}>
+                <input type="radio" name="useryzm" value="0" class="layui-input" title="否" {if isset($model.useryzm) and $model.useryzm == 0}checked{/if}>
+            </div>
+        </div> 
+        <div class="layui-form-item">
+            <label class="layui-form-label" style="width: 100px">身份验证</label>
+            <div class="layui-input-block">
+                    <input type="radio" name="authentication" value="1" class="layui-input" title="是" {if isset($model.authentication) and $model.authentication == 1}checked{/if}>
+                <input type="radio" name="authentication" value="0" class="layui-input" title="否" {if isset($model.authentication) and $model.authentication == 0}checked{/if}>
+            </div>
+        </div> 
+       <div class="layui-form-item">
+            <label class="layui-form-label" style="width: 100px">开启邮箱注册</label>
+            <div class="layui-input-block">
+                    <input type="radio" name="email" value="1" class="layui-input" title="是" {if isset($model.email) and $model.email == 1}checked{/if}>
+                <input type="radio" name="email" value="0" class="layui-input" title="否" {if isset($model.email) and $model.email == 0}checked{/if}>
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label" style="width: 100px">开启手机注册</label>
+            <div class="layui-input-block">
+                    <input type="radio" name="mobile" value="1" class="layui-input" title="是" {if isset($model.mobile) and $model.mobile == 1}checked{/if}>
+                <input type="radio" name="mobile" value="0" class="layui-input" title="否" {if isset($model.mobile) and $model.mobile == 0}checked{/if}>
+            </div>
+        </div> 
+
+        <div class="layui-form-item layui-form-text">
+                <label class="layui-form-label">META关键词</label>
+                <div class="layui-input-block">
+                    <textarea name="keywords" class="layui-textarea" placeholder="多个关键词用英文状态 , 号分割">{$model.keywords|default=''}</textarea>
+                </div>
+            </div>
+            <div class="layui-form-item layui-form-text">
+                <label class="layui-form-label">META描述</label>
+                <div class="layui-input-block">
+                    <textarea name="description" class="layui-textarea">{$model.description|default=''}</textarea>
+                </div>
+            </div>
+       <div class="layui-form-item layui-form-text">
+                <label class="layui-form-label">版权信息</label>
+                <div class="layui-input-block">
+                    <textarea name="copyright" lay-verify="required" value="{$model->copyright|default=''}"placeholder="版权信息" class="layui-textarea">{$model.copyright|default=''}</textarea>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">备案信息</label>
+                <div class="layui-input-block">
+                    <input type="text" name="beian" value="{$model.beian|default=''}" placeholder="版权信息" class="layui-input">
+                </div>
+            </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label"></label>
+           <div class="layui-input-inline">
+                <button class="layui-btn" lay-submit  lay-filter="*">确认保存</button>
+                <button type="button" class="layui-btn layui-btn-danger" onclick="layer.closeAll()">取消</button>
+            </div>
+        </div>
+    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> 
+  
+
+
+   
+
+
+<script>
+    layui.use(['util', 'upload', 'table', 'form', 'laydate'], function () {
+        var table = layui.table;
+            var laydate = layui.laydate;
+            var upload = layui.upload;
+            var util = layui.util;
+            var form = layui.form;
+            var $ = layui.jquery;
+       // var load = layer.load(3, {time: 5*1000});
+        form.render();
+// 头像上传
+var uploadInst = upload.render({
+    elem: '.ajax-admin-avatar',
+            exts: 'jpg|png|jpeg|gif|svg',
+            size: 2048,
+    url: '/system/uploads', //改成您自己的上传接口
+    done: function (result) {
+        // 上传完毕回调
+        if (result.code === 1) {
+            $('#logo').attr('src', result.url);
+            //this.item.prev('input').val(result.url);
+            $('input[name="logo"]').val(result.url);
+            layer.msg('上传成功', {icon: 1});
+        } else {
+            layer.msg(result.msg, {icon: 2});
+        }
+    }
+        });
+
+        //普通图片上传
+        var uploadInst = upload.render({
+            elem: '#upfile',
+            exts: 'jpg|png|jpeg|gif|svg',
+            size: 2048,
+            url: '/system/upload' //改成您自己的上传接口
+            , before: function (obj) {
+                //预读本地文件示例，不支持ie8
+                obj.preview(function (index, file, result) {
+                    console.log(file.name)
+                    $('#image').attr('src', result); //图片链接（base64） 
+                });
+            }
+            , done: function (res) {
+                if (res.code == 0){
+                    //上传成功
+                    $('input[name="image"]').val(res.data);
+                    layer.msg(res.msg,{icon: 1})
+                } else {
+                    layer.msg(res.msg,{icon: 0})
+                }
+            }
+            , error: function () {
+                //演示失败状态，并实现重传
+                var demoText = $('#imageText');
+                demoText.html('<span style="color: #FF5722;">上传失败</span> <a class="layui-btn layui-btn-xs demo-reload">重试</a>');
+                demoText.find('.demo-reload').on('click', function () {
+                    uploadInst.upload();
+                });
+            }
+        });
+
+      // 通用提交
+form.on('submit(*)', function (data) {
+    var index = layer.msg('提交中，请稍候', {
+        icon: 16,
+        time: false,
+        shade: 0.3
+    });
+    $(data.elem).attr('disabled', true);
+    $.ajax({
+        url: data.form.action,
+        type: data.form.method,
+        dataType: 'json',
+        data: $(data.form).serialize(),
+        success: function (result) {
+            if (result.code === 0 && result.url != '') {
+                setTimeout(function () {
+                   // location.href = result.url;
+                    location.reload();
+                }, 1000);
+            } else {
+                $(data.elem).attr('disabled', false);
+            }
+            layer.close(index);
+            layer.msg(result.msg, {icon: 1});
+        },
+        error: function (xhr, state, errorThrown) {
+            layer.close(index);
+            layer.msg(state + '：' + errorThrown, {icon: 2});
+        }
+    });
+    return false;
+});
+});
+</script>
+
+</body>
+</html>

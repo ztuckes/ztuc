@@ -1,0 +1,123 @@
+{include file="common/head" /}
+<table class="layui-hide" id="articlelog" lay-filter="articlelog"></table>
+
+<script type="text/html" id="toolbarDemo">
+    <div class="layui-btn-container">
+        <button class="layui-btn layui-btn-sm" lay-event="delete">{:__('Batch delete')}</button>
+        <button class="layui-btn layui-btn-sm" lay-event="refresh">{:__('Refresh')}</button>
+    </div>
+</script>
+
+<script type="text/html" id="barDemo">
+    <a class="layui-btn layui-btn-danger layui-btn-xs layui-icon layui-icon-delete" lay-event="del">{:__('delete')}</a>
+</script>
+ 
+<script type="text/html" id="URL">
+    <div><a href="{{ d.url }}" target="_blank">{{ d.url }}</a></div>
+</script>
+ 
+<script>
+    layui.use(['table', 'form'], function () {
+        var table = layui.table,
+            $ = layui.jquery,
+            form = layui.form;
+        form.render();
+
+        table.render({
+            elem: '#articlelog'
+            , url: '/articlelog/info'  // 请求数据路由地址
+            , toolbar: '#toolbarDemo' //开启头部工具栏，并为其绑定左侧模板
+            , defaultToolbar: ['filter', 'exports', 'print', { //自定义头部工具栏右侧图标。如无需自定义，去除该参数即可
+                title: '提示'
+                , layEvent: 'LAYTABLE_TIPS'
+                , icon: 'layui-icon-tips'
+            }]
+            , title: '{:__('User data table')}'
+            , cols: [[
+                {type: 'checkbox', fixed: 'left'}
+                , {field: 'id', title: 'ID', width: 80, align: 'center', fixed: 'left'}
+                , {field: 'uid', title: '用户ID', align: 'center', style:'background-color: #eee; color: #000;', width: 180,templet: function(d){
+        return '用户名：<span style="color: #c00;">'+ d.uid +'</span>'
+      }}
+                , {field: 'article_id', title: '文章ID', align: 'center', width: 100}
+                , {field: 'view', title: '浏览量', align: 'center', width: 80}
+                , {field: 'ip', title: 'IP地址', align: 'center', width: 140}
+                , {field: 'url', title: 'URL', align: 'center', width: 200, templet:'#URL'}
+                , {field: 'agent', title: '用户代理', align: 'center', width: 200}
+                , {field: 'createtime', title: '操作时间', align: 'center', width: 160}
+                , {fixed: 'right', title: '操作', align: 'center', toolbar: '#barDemo', width: 80}
+            ]]
+            , page: true
+            , limit: 10
+            , text: {none: '{:__('No data available')}'}
+         
+        });
+      
+
+        //头工具栏事件
+        table.on('toolbar(articlelog)', function (obj) {
+            var checkStatus = table.checkStatus(obj.config.id);
+            switch (obj.event) {
+              
+                case 'delete':
+                    var data = checkStatus.data;
+                    var ids = [];
+                    data.forEach(item => {
+                        ids.push(item.id);
+                    });
+                    if (ids <= 0) {
+                        return layer.msg('{:__('Please select Delete item')}', {icon: 0});
+                    }
+                 var index = layer.msg('{:__('Submitting, please wait')}', {
+                   icon: 16,
+                   time: false,
+                   shade: 0.3
+                 });
+                    
+                    $.post('/articlelog/del', {id: ids}, function (res) {
+                        if (res.code == 0) {
+                            layer.msg(res.msg, {icon: 1});
+                            setTimeout(function () {
+                                location.reload();  // 页面刷新
+                            }, 1500)
+                        } else {
+                            layer.msg(res.msg, {icon: 0});
+                        }
+                    }, 'json');
+                    break;
+                case 'refresh':
+                    location.reload();
+                    break;
+            }
+        });
+
+        //监听行工具事件
+        table.on('tool(articlelog)', function (obj) {
+            var data = obj.data;
+            //console.log(obj)
+            if (obj.event === 'del') {
+                layer.confirm('{:__('Really delete it')}', function (index) {
+                 var index = layer.msg('{:__('Submitting, please wait')}', {
+                   icon: 16,
+                   time: false,
+                   shade: 0.3
+                 });
+                    $.post('/articlelog/del', {id: data.id}, function (res) {
+                        if (res.code == 0) {
+                            layer.msg(res.msg, {icon: 1});
+                            setTimeout(function () {
+                                location.reload();  // 页面刷新
+                            }, 1500)
+                        } else {
+                            layer.msg(res.msg, {icon: 0});
+                            layer.close(index);
+                        }
+                    }, 'json')
+                });
+            } 
+        });
+    })
+    ;
+
+
+</script>

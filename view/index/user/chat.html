@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+<style type="text/css">
+    .txt{
+        overflow:auto;
+        overflow-x:auto;
+        overflow-y:auto;
+}
+</style>
+    <link rel="stylesheet" href="/static/layui/css/layui.css" media="all">
+    <script src="/static/layui/layui.js" charset="utf-8"></script>
+{include file="index/common/head"/}
+<body>
+{include file="index/common/header" /}
+
+<!--新增表单 start-->
+<div id="content-container" class="container">
+    <div class="row">
+        <div class="col-md-3" >
+            <span>{include file="index/common/sidenav" /}</span>
+           
+        </div>
+        <div class="col-md-9">
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <h3 style="margin-top: 15px;" class="page-header"><i style="margin-top: -30px;">Chat zone</i></h3>
+                    <!---分页---->
+                      <div class="panel panel-default" id="comments">
+                <div class="panel-heading">
+                    <h3 class="panel-title">{:__('Comment list')}
+                        
+                        <small><?php echo str_replace('%a', '<b style="color: #ff0000;">' . $count . '</b>', __('Total chat comments')); ?></small>
+                    </h3>
+                </div>
+                <div class="panel-body">
+                    <div id="comment-container">
+                        <!-- S 评论列表 -->
+                        <div id="commentlist">
+                           {foreach $chat as $vo}
+                            <dl>
+                                <dt><a href="#" target="_blank"><img src='{$vo.avatar}'/></a></dt>
+                                <dd>
+                                    <div class="parent">
+                                        <cite><a href="/user/index">{$vo.username ?: __('tourist')}</a></cite>
+                                        <small>{$vo.createtime}<a href="javascript:;" title="{$user.username}" class="reply">回复TA</a></small>
+                                       <div class="txt"> <p>{$vo.content}</p></div>
+                                  </div> 
+                                </dd>
+                                <div class="clearfix"></div>
+                            </dl>
+                            {/foreach}
+                        </div>
+
+                       
+                        <!-- E 评论列表 -->
+
+                        <!-- S 评论分页 -->
+                        <div id="commentpager" class="text-center">
+                            {$chat|raw}
+                        </div>
+                      </div>
+                  </div>
+               </div>
+               <!---分页---->
+               <form id="changepwd-form" class="layui-form" method="POST" action="" onclick="return false">
+        
+                    <input type="hidden" name="id" value="{$user.id}" />  
+ 
+        <div class="layui-form-item">
+            <label class="layui-form-label">{:__('Leaving a message.')}</label>
+             <div class="layui-input-inline">
+                      <span style="display: inline-block;">
+
+                   <input type="text" name="content" id="content" lay-verify="required" value="" placeholder="请输入" autocomplete="off" class="layui-input"></span>
+
+                            
+                  <span class="input-group-btn" style="display: inline-block;padding:0;border:none;">
+                                       <button class="btn btn-info btn-change" lay-filter="save" lay-submit>{:__('preservation')}</button>
+                                    </span>
+            </div>
+        </div>
+    </form>
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+</div>
+
+{include file="index/common/footer" /}
+{include file="index/common/script" /}
+
+<script>
+    layui.use('form', function () {
+        var $ = layui.jquery,
+            form = layui.form;
+        form.render();
+        //表单提交
+         form.on('submit(save)', function (data) {  
+           
+       var index = layer.msg('<i>{:__('Submitting, please wait')}</i>', {
+        icon: 16,
+        time: false,
+        shade: 0.3,
+        anim: 4
+    });
+           params = data.field;
+            submit($, params);
+            return false;
+        });
+
+        function submit($, params) {
+            $.post('/user/chat', params, function (res) {
+                 if (res.code == 0) {
+                    layer.msg(res.msg, {icon: 1});
+                    setTimeout(function () {
+                        location.reload();
+                    }, 1500)
+                } else {
+                    layer.msg(res.msg, {icon: 0})
+                }
+            }, 'json');
+        }
+    })
+</script>
+
+</body>
+
+</html>

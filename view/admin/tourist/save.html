@@ -1,0 +1,40 @@
+{extend name="base" /}
+{block name="body"}
+<div class="layui-card">
+    <div class="layui-card-body">
+        <form action="" class="layui-form" method="post">
+           
+        <div class="layui-form-item">
+            <label class="layui-form-label">用户名</label>
+                <div class="layui-input-block">
+                <input type="text" name="tourist_name" id="tourist_name"value="{$data.tourist_name|default=''}" lay-verify="required" style="width:90%"
+                       placeholder="用户名"
+                       autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">会员IP</label>
+               <div class="layui-input-block">
+                <input type="text" name="ip" id="ip" value="{$data.ip|default=''}" style="width:90%"
+                       placeholder="会员IP"
+                       autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">在线时间</label>
+               <div class="layui-input-block">
+                <input type="text" name="line_time" id="line_time" value="{$data.line_time|default=''}" style="width:90%"
+                       placeholder="在线时间"
+                       autocomplete="off" class="layui-input">
+            </div>
+        </div>
+            <div class="layui-form-item">
+                <div class="layui-input-block">
+                    <button class="layui-btn" lay-filter="i" lay-submit="">保存</button>
+                    <button class="layui-btn layui-btn-primary" type="reset">重置</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{/block}

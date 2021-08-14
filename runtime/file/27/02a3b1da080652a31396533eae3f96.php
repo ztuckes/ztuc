@@ -1,0 +1,4 @@
+<?php
+//000000003600
+ exit();?>
+a:14:{i:0;a:3:{s:2:"id";i:1;s:8:"cat_name";s:12:"笑话故事";s:3:"pid";i:0;}i:1;a:3:{s:2:"id";i:2;s:8:"cat_name";s:12:"人生折理";s:3:"pid";i:3;}i:2;a:3:{s:2:"id";i:3;s:8:"cat_name";s:12:"励志文章";s:3:"pid";i:0;}i:3;a:3:{s:2:"id";i:4;s:8:"cat_name";s:12:"经典语句";s:3:"pid";i:0;}i:4;a:3:{s:2:"id";i:5;s:8:"cat_name";s:12:"心情随笔";s:3:"pid";i:4;}i:5;a:3:{s:2:"id";i:6;s:8:"cat_name";s:12:"散文精选";s:3:"pid";i:4;}i:6;a:3:{s:2:"id";i:7;s:8:"cat_name";s:12:"杂文小记";s:3:"pid";i:9;}i:7;a:3:{s:2:"id";i:8;s:8:"cat_name";s:12:"经典游戏";s:3:"pid";i:3;}i:8;a:3:{s:2:"id";i:9;s:8:"cat_name";s:12:"爱情文章";s:3:"pid";i:0;}i:9;a:3:{s:2:"id";i:10;s:8:"cat_name";s:12:"亲情文章";s:3:"pid";i:9;}i:10;a:3:{s:2:"id";i:11;s:8:"cat_name";s:12:"校园文章";s:3:"pid";i:0;}i:11;a:3:{s:2:"id";i:12;s:8:"cat_name";s:12:"友情文章";s:3:"pid";i:9;}i:12;a:3:{s:2:"id";i:14;s:8:"cat_name";s:12:"英语文章";s:3:"pid";i:0;}i:13;a:3:{s:2:"id";i:15;s:8:"cat_name";s:12:"经典文章";s:3:"pid";i:4;}}

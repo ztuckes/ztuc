@@ -1,0 +1,40 @@
+{extend name="base" /}
+{block name="body"}
+<div class="layui-card">
+    <div class="layui-card-body">
+        <form action="" class="layui-form" method="post">
+        
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">{:__('Jump link')}</label>
+            <div class="layui-input-block">
+                <input type="text" name="url" id="url" value="{$data.url|default=''}" style="width: 80%" value="#"
+                       placeholder="{:__('Jump link')}"
+                       autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">{:__('describe')}</label>
+            <div class="layui-input-block">
+                <input type="text" name="desc" id="desc" value="{$data.desc|default=''}" style="width: 80%" lay-verify="required"
+                       placeholder="{:__('describe')}"
+                       autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">{:__('small icons')}</label>
+            <div class="layui-input-block">
+                <input type="text" name="icon" id="icon" value="{$data.icon|default=''}" style="width: 80%" lay-verify="required" placeholder="{:__('small icons')}"
+                       autocomplete="off" class="layui-input" value="">
+            </div>
+        </div>
+            <div class="layui-form-item">
+                <div class="layui-input-block">
+                    <button class="layui-btn" lay-filter="i" lay-submit="">保存</button>
+                    <button class="layui-btn layui-btn-primary" type="reset">重置</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{/block}

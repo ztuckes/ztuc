@@ -1,0 +1,17 @@
+<div class="sidenav">
+    <ul class="list-group">
+        <li class="list-group-heading">{:__('Membership Center')}</li>
+         <?php foreach($sidebar as $vo): ?>
+         
+        <li class="list-group-item "> <a href="<?php echo htmlentities($vo['url']); ?>"><i class="<?php echo htmlentities($vo['icon']); ?>"></i><?php echo htmlentities(__($vo['desc'])); ?></a> </li>
+         <?php endforeach; ?>
+        <!--li class="list-group-item "> <a href="/user/contribution"><i class="fa fa-user-circle fa-fw"></i> {:__('Contribution zone')}</a> </li>
+        <li class="list-group-item "> <a href="/user/index"><i class="fa fa-user-circle fa-fw"></i> {:__('Membership Center')}</a> </li>
+        <li class="list-group-item "> <a href="/signin"><i class="fa fa-user-circle fa-fw"></i> {:__('My sign in')}</a> </li>
+        <li class="list-group-item "> <a href="/user/profile"><i class="fa fa-user-o fa-fw"></i> {:__('personal data')}</a> </li>
+        <li class="list-group-item "> <a href="/chats"><i class="fa fa-user-o fa-fw"></i> {:__('Message zone')}</a> </li>
+        <li class="list-group-item "> <a href="/user/changepwd"><i class="fa fa-key fa-fw"></i> {:__('Change Password')}</a> </li>
+        <li class="list-group-item "> <a href="/game/lottery"><i class="fa fa-key fa-fw"></i> {:__('Lottery turntable')}</a> </li>
+        <li class="list-group-item "> <a href="/user/logout" onclick="return confirm('确认要安全退出？');"><i class="fa fa-sign-out fa-fw"></i> {:__('Log out')}</a> </li-->
+    </ul>
+</div>

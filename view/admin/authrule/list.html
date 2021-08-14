@@ -1,0 +1,315 @@
+{include file="common/head" /}
+<table class="layui-hide" id="authrule" lay-filter="authrule"></table>
+
+<script type="text/html" id="toolbarDemo">
+    <div class="layui-btn-container">
+        <button class="layui-btn layui-btn-sm" lay-event="delete">{:__('Batch delete')}</button>
+        <button class="layui-btn layui-btn-sm" lay-event="refresh">{:__('Refresh')}</button>
+        <button class="layui-btn layui-btn-sm" lay-event="add">{:__('newly added')}</button>
+    </div>
+</script>
+
+<script type="text/html" id="barDemo">
+    <a class="layui-btn layui-icon layui-icon-edit layui-btn-xs" lay-event="edit">{:__('edit')}</a>
+    <a class="layui-btn layui-btn-danger layui-btn-xs layui-icon layui-icon-delete" lay-event="del">{:__('delete')}</a>
+</script>
+<!--新增表单 start-->
+<div id="add-main" style="display: none;margin-top: 20px;">
+    <form class="layui-form" id="add-form" action="" lay-filter="add-form">
+        <input type="hidden" name="id" value="0" id="id">
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">{:__('Parent')}</label>
+            <div class="layui-input-inline">
+                <select class="layui-input" name="pid" id="pid" lay-verify="required" lay-search="">
+                    <option value="0">{:__('nothing')}</option>
+                    {foreach $rule as $vo}
+                    <option value="{$vo.id}">{$vo.name}</option>
+                    {/foreach}
+                </select>
+            </div>
+        </div>
+
+        <div class="layui-form-item center">
+            <label class="layui-form-label">{:__('route')}</label>
+            <div class="layui-input-block">
+                <input type="text" placeholder="{:__('route')}" name="rule_name" id="rule_name" style="width: 95%"
+                       lay-verify="required" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">{:__('title')}</label>
+            <div class="layui-input-block">
+                <input type="text" placeholder="{:__('title')}" id="title" style="width: 95%" name="title" lay-verify="required"
+                       autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">{:__('small icons')}</label>
+            <div class="layui-input-block">
+                <input type="text" name="icon" id="icon" style="width: 95%" lay-verify="required" placeholder="{:__('small icons')}"
+                       autocomplete="off" class="layui-input" value="">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">{:__('sort')}</label>
+            <div class="layui-input-block">
+                <input type="text" name="weigh" id="weigh" style="width: 95%" placeholder="{:__('sort')}"
+                       autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">{:__('Menu')}</label>
+            <div class="layui-input-inline">
+
+                <select class="layui-input" name="ismenu" id="ismenu" lay-verify="required" lay-search="">
+                   <option>{:__('Please select')}</option>//加上这一行，先占个坑
+                    <option value="1">{:__('display')}</option>
+                    <option value="0">{:__('hide')}</option>
+                   
+                </select>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">{:__('state')}</label>
+           <div class="layui-input-inline">
+                <select class="layui-input" name="status" id="status" lay-verify="required" lay-search="">
+                   <option>{:__('Please select')}</option>//加上这一行，先占个坑
+                    <option value="1">{:__('open')}</option>
+                    <option value="0">{:__('close')}</option>
+                   
+                </select>
+                </div>
+              </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label"></label>
+            <div class="layui-input-block">
+                <button class="layui-btn" lay-submit lay-filter="save">{:__('preservation')}</button>
+                <button type="button" class="layui-btn layui-btn-danger" onclick="layer.closeAll()">{:__('cancel')}</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+ 
+<script type="text/html" id="url">
+
+    <div><a href="{{d.rule_name}}"><font style="color: #999;">{{d.rule_name}}</font></a></div>
+</script>
+ 
+<script type="text/html" id="img">
+
+    <div><i class="layui-icon {{d.icon}}" style="font-size: 25px; color: #009688;"></i></div>
+</script>
+<!--新增表单 end-->
+<script>
+    layui.use(['table', 'form'], function () {
+        var table = layui.table,
+            $ = layui.jquery,
+            form = layui.form;
+        form.render();
+
+        table.render({
+            elem: '#authrule'
+            , url: '/rule/info'  // 请求数据路由地址
+            , toolbar: '#toolbarDemo' //开启头部工具栏，并为其绑定左侧模板
+            , defaultToolbar: ['filter', 'exports', 'print', { //自定义头部工具栏右侧图标。如无需自定义，去除该参数即可
+                title: '提示'
+                , layEvent: 'LAYTABLE_TIPS'
+                , icon: 'layui-icon-tips'
+            }]
+            , title: '{:__('User data table')}'
+            , cols: [[
+                {type: 'checkbox', fixed: 'left'}
+                , {field: 'id', title: 'ID', width: 80, align: 'center', fixed: 'left'}
+                , {field: 'pid', title: '父ID', align: 'center', width: 120}
+                , {field: 'title', title: '标题', align: 'center', width: 160}
+                , {field: 'rule_name', title: '路由', align: 'center', width: 120, templet:'#url'}
+                , {field: 'icon', title: '图标', align: 'center', width: 160, templet:'#img'}
+                , {field: 'ismenu', title: '菜单', align: 'center', width: 160,templet:function (d) {
+                       return d.ismenu ? '显示' : '隐藏';
+                    }}
+                , {field: 'weigh', title: '排序', align: 'center', width: 160}
+                , {field: 'createtime', title: '创建时间', align: 'center', width: 160}
+                , {
+                    field: 'status', title: '状态', align: 'center', width: 80, templet: function (d) {
+                        return d.status ? ' <i class="layui-icon layui-icon-ok-circle" style="font-size: 25px; color: #009688;"></i>' : '<i class="layui-icon layui-icon-close-fill" style="font-size: 25px; color: #FF5722;"></i>';
+                    }
+                }
+                , {fixed: 'right', title: '操作', align: 'center', toolbar: '#barDemo', width: 150}
+            ]]
+            , page: true
+            , limit: 10
+            , text: {none: '{:__('No data available')}'}
+        });
+        //表单提交
+        form.on('submit(save)', function (data) {
+        var index = layer.msg('{:__('Submitting, please wait')}', {
+        icon: 16,
+        time: false,
+        shade: 0.3
+    });
+            params = data.field;
+            submit($, params);
+            return false;
+        });
+
+        // 新增
+        function submit($, params) {
+            var url = params.id > 0 ? '/rule/edit' : '/rule/add';
+            $.post(url, params, function (res) {
+                if (res.code == 0) {
+                    layer.msg(res.msg, {icon: 1});
+                    setTimeout(function () {
+                        layer.closeAll();   // 关闭弹窗
+                        location.reload();  // 页面刷新
+                    }, 1500)
+                } else {
+                    layer.msg(res.msg, {icon: 0})
+                }
+            }, 'json');
+        }
+form.on('switch(filter)', function(data){
+  console.log(data.elem); //得到checkbox原始DOM对象
+  console.log(data.elem.checked); //开关是否开启，true或者false
+  console.log(data.value); //开关value值，也可以通过data.elem.value得到
+  console.log(data.othis); //得到美化后的DOM对象
+}); 
+        //头工具栏事件
+        table.on('toolbar(authrule)', function (obj) {
+            var checkStatus = table.checkStatus(obj.config.id);
+            switch (obj.event) {
+                case 'add':
+                    // 清空表单
+                    document.getElementById('id').value = 0;
+                    $("#add-form")[0].reset();
+                    layui.form.render();
+                   var title = $(this).html();
+                     var width = $(this).data('width');
+                     var height = $(this).data('height');
+                if(navigator.userAgent.match(/(iPhone|iPod|Android|ios)/i)){
+                      var width = '90%';
+                      var height = '500px';
+                     }else{
+                        var width = '500px';
+                      var height = '500px';
+                     };
+                // 打开窗口
+                layer.open({  
+                     type: 1 //Page层类型
+                     ,area: [width, height]
+                     ,title: title 
+                     ,closeBtn: false
+                     ,shade: 0.3 //遮罩透明度
+                     ,maxmin: true //允许全屏最小化
+                     ,anim: 1 //0-6的动画形式，-1不开启
+                     ,shadeClose: true
+                     ,id: 'layui-id' //设定一个id，防止重复弹出
+                     ,moveType: 0 //拖拽模式，0或者1
+                     ,content: $("#add-main")
+                     });
+                    break;
+                case 'delete':
+                    var data = checkStatus.data;
+                    var ids = [];
+                    data.forEach(item => {
+                        ids.push(item.id);
+                    });
+                    if (ids <= 0) {
+                        return layer.msg('{:__('Please select Delete item')}', {icon: 0});
+                    }
+                 var index = layer.msg('{:__('Submitting, please wait')}', {
+                   icon: 16,
+                   time: false,
+                   shade: 0.3
+                 });
+                    $.post('/rule/del', {id: ids}, function (res) {
+                        if (res.code == 0) {
+                            layer.msg(res.msg, {icon: 1});
+                            setTimeout(function () {
+                                location.reload();  // 页面刷新
+                            }, 1500)
+                        } else {
+                            layer.msg(res.msg, {icon: 0});
+                        }
+                    }, 'json');
+                    break;
+                case 'refresh':
+                    location.reload();
+                    break;
+            }
+        });
+
+        //监听行工具事件
+        table.on('tool(authrule)', function (obj) {
+            var data = obj.data;
+            //console.log(obj)
+            if (obj.event === 'del') {
+                layer.confirm('{:__('Really delete it')}', function (index) {
+                 
+                 var index = layer.msg('{:__('Submitting, please wait')}', {
+                   icon: 16,
+                   time: false,
+                   shade: 0.3
+                 });
+                    $.post('/rule/del', {id: data.id}, function (res) {
+                        if (res.code == 0) {
+                            layer.msg(res.msg, {icon: 1});
+                            setTimeout(function () {
+                                location.reload();  // 页面刷新
+                            }, 1500)
+                        } else {
+                            layer.msg(res.msg, {icon: 0});
+                            layer.close(index);
+                        }
+                    }, 'json')
+                });
+            } else if (obj.event === 'edit') {
+                if (data.length == 0) {
+                    return layer.msg('{:__('Please select a line')}', {icon: 0});
+                }
+                // 打开窗口
+                var title = $(this).html();
+                     var width = $(this).data('width');
+                     var height = $(this).data('height');
+                if(navigator.userAgent.match(/(iPhone|iPod|Android|ios)/i)){
+                      var width = '90%';
+                      var height = '500px';
+                     }else{
+                        var width = '500px';
+                      var height = '500px';
+                     };
+                // 打开窗口
+                layer.open({  
+                     type: 1 //Page层类型
+                     ,area: [width, height]
+                     ,title: title 
+                     ,closeBtn: false
+                     ,shade: 0.3 //遮罩透明度
+                     ,maxmin: true //允许全屏最小化
+                     ,anim: 4 //0-6的动画形式，-1不开启
+                     ,shadeClose: true
+                     ,id: 'layui-id' //设定一个id，防止重复弹出
+                     ,moveType: 0 //拖拽模式，0或者1
+                     ,content: $("#add-main")
+                     });
+                document.getElementById('id').value = data.id;
+                document.getElementById('title').value = data.title;
+                document.getElementById('rule_name').value = data.rule_name;
+                document.getElementById('icon').value = data.icon;
+                document.getElementById('pid').value = data.pid;
+                document.getElementById('status').value = data.status;
+                document.getElementById('ismenu').value = data.ismenu;
+                document.getElementById('weigh').value = data.weigh;
+                
+                    layui.form.render();
+            }
+        });
+    })
+    ;
+
+
+</script>

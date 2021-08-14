@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>管理员登录</title>
+    <link rel="stylesheet" type="text/css" href="/static/login.css">
+    <link rel="stylesheet" href="/static/layui/css/layui.css" media="all">
+    <script src="/static/layui/jquery.js" charset="utf-8"></script>
+    <script src="/static/jquery.min.js" charset="utf-8"></script>
+
+</head>
+
+<body>
+
+
+<div class="login-wrapper">
+    <form id="login_form" class="layui-form" action="{:url('admin/check')}" method="post"> 
+    <div class="logo" style="text-align: center;">
+      <?php $arr=array(10,20); $rand=array_rand($arr);?>
+
+         {if $rand == 0}
+            <img src="{:seo('image')}" width="80%" height="60">
+         {else/}
+            <img src="{:seo('logo')}" width="80%" height="60">
+          {/if}   
+        <h4>{:__('Administrator login')}</h4>
+
+        <div class="logo" style="margin-bottom: 8px;"></div>
+         </div>
+        
+        <div class="layui-form-item layui-input-icon-group">
+            <i class="layui-icon layui-icon-username"></i>
+            <input class="layui-input" name="username" id="username" placeholder="{:__('Please input user name / email / mobile number')}" autocomplete="off"
+                   lay-verType="tips" lay-verify="required" required/>
+        </div>
+        <div class="layui-form-item layui-input-icon-group">
+            <i class="layui-icon layui-icon-password"></i>
+            <input class="layui-input" name="password" id="password" placeholder="{:__('Please enter the login password')}" type="password"
+                   lay-verType="tips" lay-verify="required" required/>
+        </div>
+        {if seo('adminyzm')=='1'}
+                <div class="layui-form-item layui-input-icon-group login-captcha-group">
+            <i class="layui-icon layui-icon-auz"></i>
+            <input class="layui-input" name="captcha" placeholder="{:__('Please enter the verification code')}" autocomplete="off"
+                   lay-verType="tips" lay-verify="required" required/>
+            <img src="{:captcha_src()}" onclick="this.src='{:captcha_src()}?rand='+Math.random()" class="login-captcha" />
+        </div>
+        {/if}
+                <!--div class="layui-form-item">
+            <input type="checkbox" name="keeplogin" id="keeplogin" value="1" title="信任当前设备，30天内登录无需身份验证" lay-skin="primary" checked>
+        </div-->
+        <div class="layui-form-item">
+            <button class="layui-btn layui-btn-fluid" lay-filter="save" lay-submit>{:__('Sign in now')}</button>
+        </div>
+      
+    </form>
+</div>  
+
+</body>
+<script src="/static/layui/layui.js" charset="utf-8"></script>
+<!--script charset="utf-8" type="text/javascript" src="/static/layui/mobile/jquery.js" ></script>
+<script charset="utf-8" type="text/javascript" src="/static/layui/mobile/layer.js" ></script-->
+<script>
+      layui.use(['layer', 'form', 'jquery'], function(){
+        var layer = layui.layer,
+            form  = layui.form,
+            $     = layui.jquery;
+        //表单提交
+         form.on('submit(save)', function (data) {
+    var index = layer.msg('<i>{:__('Login, please wait')}</i>', {
+        icon: 16,
+        time: false,
+        shade: 0.3,
+        anim: 1
+    });
+
+    $.ajax({
+        url: data.form.action,
+        type: data.form.method,
+        dataType: 'json',
+        data: $(data.form).serialize(),
+        success: function (result) {
+            if (result.code === 0) {
+                setTimeout(function () {
+                        location.href = result.url;
+                    //parent.location.reload();
+                }, 1000);
+           
+            layer.close(index);
+            layer.msg(result.msg, {icon: 1});
+            }else{
+                
+            layer.close(index);
+            layer.msg(result.msg, {icon: 2});
+            }
+        },
+    });
+    return false;
+});
+});
+</script>
+</html>

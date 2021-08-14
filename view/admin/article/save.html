@@ -1,0 +1,85 @@
+{extend name="base" /}
+{block name="body"}
+<div class="layui-card">
+    <div class="layui-card-body">
+        <form action="" class="layui-form" method="post">
+           
+        <div class="layui-form-item center">
+                <label class="layui-form-label">LOGO</label>
+              <div class="layui-input-block">
+                   <span class="layui-upload-list">
+                 <img class="layui-upload-img layui-circle" id="image" src="<?php echo htmlentities((isset($list['url']) && ($list['url'] !== '')?$list['url']:'/upload/404.png')); ?>" width="60" height="60">
+                    </span>
+                    <input type="hidden" name="image" value="" autocomplete="off" placeholder="" class="layui-input">
+                    <button type="button" class="layui-btn ajax-admin-avatar"><i class="fa fa-file-image-o"></i> 选择图片</button>
+                </div>
+            </div>
+            
+            
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">{:__('Column')}</label>
+            <div class="layui-input-inline">
+                <select class="layui-input" name="cat_id" id="cat_id" style="width: 95%" lay-verify="required" lay-search="">
+                    <option value="0">无</option>
+                   {foreach $name as $vo} 
+                    
+                    <option value="{$vo.id}" {if isset($list.cat_id) and $list.cat_id == $vo.id}Selected{/if}>{$vo.name}</option>
+                                  
+                    {/foreach}
+                </select>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">{:__('title')}</label>
+            <div class="layui-input-block">
+                <input type="text" name="title" id="title" value="{$list.title|default=''}" style="width: 95%" lay-verify="required"
+                       placeholder="标题"
+                       autocomplete="off" class="layui-input">
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">{:__('content')}</label>
+            <div class="layui-input-block">
+                <textarea placeholder="请输入内容" lay-verify="required" name="content" style="width: 95%" id="content" class="layui-textarea">{$list.content|default=''}</textarea>
+            </div>
+        </div>
+
+
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">{:__('sign')}</label>
+            <div class="layui-input-inline">  
+                <select class="layui-input" name="flag" id="flag" style="width: 95%" lay-verify="required" lay-search="">
+                   <option>{:__('Please select')}</option>//加上这一行，先占个坑
+                    <option value="1" {if isset($list.flag) and $list.flag == '1'}Selected{/if}>{:__('newest')}</option>
+                    <option value="2" {if isset($list.flag) and $list.flag == '2'}Selected{/if}>{:__('Hot')}</option>
+                    <option value="3" {if isset($list.flag) and $list.flag == '3'}Selected{/if}>{:__('recommend')}</option>
+                   
+                </select>
+            </div>
+
+            </div>    
+        <div class="layui-form-item">
+            <label class="layui-form-label">{:__('sort')}</label>
+            <div class="layui-input-inline"> 
+                       <select class="layui-input" name="weigh" id="weigh" style="width: 95%" lay-verify="required" lay-search="">
+                   <option>{:__('Please select')}</option>//加上这一行，先占个坑
+                    <option value="1" {if isset($list.weigh) and $list.weigh == '1'}Selected{/if}>{:__('Top')}</option>
+                    <option value="0" {if isset($list.weigh) and $list.weigh == '0'}Selected{/if}>{:__('normal')}</option>
+                   
+                </select>
+            </div>
+        </div>
+
+            <div class="layui-form-item">
+                <div class="layui-input-block">
+                    <button class="layui-btn" lay-filter="i" lay-submit="">保存</button>
+                    <button class="layui-btn layui-btn-primary" type="reset">重置</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{/block}

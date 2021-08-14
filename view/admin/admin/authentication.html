@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{:__('identity authentication')}</title>
+    <link rel="stylesheet" type="text/css" href="/static/login.css">
+    <link rel="stylesheet" href="/static/layui/css/layui.css" media="all">
+    <script src="/static/layui/jquery.js" charset="utf-8"></script>
+    <script src="/static/jquery.min.js" charset="utf-8"></script>
+
+</head>
+
+<body>
+
+
+<div class="login-wrapper">
+    <form id="login_form" class="layui-form" action="" method="post">
+        <h1>{:__('identity authentication')}</h1>
+        <div class="layui-form-item layui-input-icon-group">
+                </div>
+         <div class="layui-form-item layui-input-icon-group">
+            <i class="layui-icon layui-icon-email"></i>
+            <input class="layui-input" name="email" id="email" value="<?php echo base64_decode($_GET['email']);?>" placeholder="{:__('mailbox')}" autocomplete="off"
+                   lay-verType="tips" lay-verify="required" required readonly="readonly"/>
+        </div>
+            
+                <div class="layui-form-item layui-input-icon-group login-captcha-group">
+            <i class="layui-icon layui-icon-auz"></i>
+            <input class="layui-input" id="code" name="code" placeholder="{:__('Please enter the verification code')}" autocomplete="off"/>
+            <botton lay-filter="retrievemima" id="emaila" lay-submit class="login-captcha" />{:__('Click send')}</botton>
+        </div>
+             
+                <div class="layui-form-item layui-input-icon-group login-captcha-group">
+            <i class="layui-icon layui-icon-auz"></i>
+            <input class="layui-input" name="captcha" id="captcha" placeholder="{:__('Please enter the verification code')}" autocomplete="off" />
+            <img src="{:captcha_src()}" onclick="this.src='{:captcha_src()}?rand='+Math.random()" class="login-captcha" />
+        </div>
+        
+                <div class="layui-form-item">
+            <input type="checkbox" name="keeplogin" id="keeplogin" value="1" title="{:__('Trust current device, no need to verify within 7 days')}" lay-skin="primary" checked>
+        </div>
+        <div class="layui-form-item">
+           <input type="button" class="layui-btn-fluid" id='btn' lay-filter="save" lay-submit disabled="disabled" value="{:__('Submit for verification')}">
+        </div>
+      
+    </form>
+</div>  
+
+    <script>
+
+   $("input").on("input",function(){
+             var getCode = $("#code").val();
+             var getCaptcha = $("#captcha").val();
+             var getKeeplogin = $("#Keeplogin").val();
+             var getEmail = $("#email").val();
+ 
+             $(this).css("color","#232323");
+ 
+             if(getCode != '' && getCaptcha != '' && getKeeplogin != '' && getEmail != ''){
+             $('#btn').attr('disabled', false).css('background','#009688').css('border','none').css('color','#fff'); 
+               }
+             else{ 
+             $('#btn').attr('disabled', true).css('background','rgba(0,0,0,0.2)').css('border','1px solid #fff').css('color','#232323');  
+    
+           }
+       });
+     
+    </script>
+
+<style>
+.notClick{
+height:40px; pointer-events: none
+ } 
+</style>
+</body>
+<script src="/static/layui/layui.js" charset="utf-8"></script>
+<!--script charset="utf-8" type="text/javascript" src="/static/layui/mobile/jquery.js" ></script>
+<script charset="utf-8" type="text/javascript" src="/static/layui/mobile/layer.js" ></script-->
+<script>
+    layui.use(['layer', 'form', 'jquery'], function(){
+        var layer = layui.layer,
+            form  = layui.form,
+            $     = layui.jquery;
+form.on('submit(retrievemima)', function (data) {
+                //清空input
+                $("input[name='code']").val("").focus();
+                $("input[name='password']").val("").focus();
+   var index = layer.msg('<i>{:__('Sending, please wait')}</i>', {
+        icon: 16,
+        time: false,
+        shade: 0.3,
+        anim: 1
+    });
+    $.ajax({
+         url: "/admin/authentication",
+        type: data.form.method,
+        dataType: 'json',
+        data: $(data.form).serialize(),
+        success: function (result) {
+            if (result.code === 0) {
+            //$('input[name="code"]').val(result.captcha);
+             // layer.msg('发送成功', {icon: 1});
+                setTimeout(function () {
+                     if(isNaN(parseInt($("#emaila").html()))){
+                        var origText  = '60';
+                        var interval = setInterval(function(){
+                            var time = --origText;
+                            if(time <= 0) {
+                                clearInterval(interval);
+                                $('#emaila').html('{:__('Resend')}').css('border','none').css('color','#ffffff').css('background','#009688').removeClass("notClick");
+                            }else{
+                                $('#emaila').html(time+'&nbsp;&nbsp;{:__('second')}').css('border','1px solid #f2f2f2').css('color','#616161').css('background','buttonface').addClass('notClick');
+                            
+                        }
+                        }, 1000);
+                   // parent.location.reload();
+                   }
+                }, 1000);
+
+            layer.close(index);
+            layer.msg(result.msg, {icon: 1});
+            }else{
+                
+            layer.close(index);
+            layer.msg(result.msg, {icon: 2});
+            }
+        },
+    });
+    return false;
+});
+form.on('submit(save)', function (data) {
+    var index = layer.msg('<i>{:__('Verification in progress, please wait')}</i>', {
+        icon: 16,
+        time: false,
+        shade: 0.3,
+        anim: 4
+    });
+
+    $.ajax({
+        url: "/admin/authenticationcheck",
+        type: data.form.method,
+        dataType: 'json',
+        data: $(data.form).serialize(),
+        success: function (result) {
+            if (result.code === 0) {
+                setTimeout(function () {
+                        location.href = result.url;
+                    //parent.location.reload();
+                }, 1000);
+           
+            layer.close(index);
+            layer.msg(result.msg, {icon: 1});
+            }else{
+                
+            layer.close(index);
+            layer.msg(result.msg, {icon: 2});
+            }
+        },
+    });
+    return false;
+    
+});
+});
+
+</script>

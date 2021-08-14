@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<style type="text/css">
+    .txt{
+        overflow:auto;
+        overflow-x:auto;
+        overflow-y:auto;
+}
+</style>
+    <link rel="stylesheet" href="/static/layui/css/layui.css" media="all">
+    <script src="/static/layui/layui.js" charset="utf-8"></script>
+{include file="index/common/head"/}
+<body>
+{include file="index/common/header" /}
+
+<!--新增表单 start-->
+<div id="content-container" class="container">
+    <div class="row">
+        <div class="col-md-3" >
+            <span>{include file="index/common/sidenav" /}</span>
+           
+        </div>
+        <div class="col-md-9">
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <h2 class="page-header">Change Password</h2>
+                    <form id="changepwd-form" class="form-horizontal" method="POST" action="/user/change" onclick="return false">
+
+                <input type="hidden" name="username" id="username" value="{$user.username}" >
+                        <div class="form-group">
+                            <label for="oldpassword" class="control-label col-xs-12 col-sm-2">{:__('Old password')}</label>
+                            <div class="col-xs-12 col-sm-4">
+                                <input type="password" class="form-control" id="oldpassword" name="oldpassword" value="" data-rule="required;oldpassword" placeholder="{:__('Old password')}">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="newpassword" class="control-label col-xs-12 col-sm-2">{:__('New password')}</label>
+                            <div class="col-xs-12 col-sm-4">
+                                <input type="password" class="form-control" data-rule="required;newpassword" id="newpassword" name="newpassword" value="" placeholder="{:__('New password')}" />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="renewpassword" class="control-label col-xs-12 col-sm-2">{:__('Confirm password')}</label>
+                            <div class="col-xs-12 col-sm-4">
+                                <input type="password" class="form-control" data-rule="required;renewpassword" id="renewpassword" name="renewpassword" value="" placeholder="{:__('Confirm password')}" />
+                            </div>
+                        </div>
+
+                        <div class="form-group normal-footer">
+                            <label class="control-label col-xs-12 col-sm-2"></label>
+                            <div class="col-xs-12 col-sm-8">
+                                <button class="btn btn-primary" lay-filter="retrievemima" lay-submit>{:__('Submit for verification')}</button>
+                                <button type="reset" class="btn btn-default btn-embossed" onclick="reset(id)">{:__('Refill')}</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{include file="index/common/footer" /}
+{include file="index/common/script" /}
+<script>
+    layui.use(['layer', 'form', 'jquery'], function(){
+        var layer = layui.layer,
+            form  = layui.form,
+            $     = layui.jquery;
+form.on('submit(retrievemima)', function (data) {
+   
+       var index = layer.msg('<i>{:__('Modifying, please wait')}</i>', {
+        icon: 16,
+        time: false,
+        shade: 0.3,
+        anim: 1
+    });
+    $.ajax({
+        url: data.form.action,
+        type: data.form.method,
+        dataType: 'json',
+        data: $(data.form).serialize(),
+       success: function (result) {
+            if (result.code === 0) {
+                setTimeout(function () {
+                        location.href = result.url;
+                    //parent.location.reload();
+                }, 1000);
+           
+                    location.reload();
+            layer.close(index);
+            layer.msg(result.msg, {icon: 1});
+            }else{
+            layer.close(index);
+            layer.msg(result.msg, {icon: 2});
+            }
+        },
+        error: function (result) {
+            layer.close(index);
+            layer.msg(state + '：' + errorThrown, {icon: 2});
+        }
+    });
+    return false;
+});
+});
+
+</script>
+</body>
+
+</html>

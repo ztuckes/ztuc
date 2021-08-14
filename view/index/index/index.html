@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>
+<html class="lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>
+<html class="lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>
+<html class="lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!-->
+<html class=""> <!--<![endif]-->
+{include file="index/common/head"/}
+{include file="common/head"/}
+<body class="group-page">
+<script>
+layui.use('layer',function(){
+var layer = layui.layer;
+ 
+    layer.ready(function(){
+      layer.msg('<img src="{:seo('image')}" width="60" height="40">{:seo('welcomespeech')}', {time: 5*1000});
+    });  
+ 
+});
+</script>
+{include file="index/common/header" /}
+{include file="index/common/canvas/clock" /}
+{include file="index/common/canvas/moon" /}
+{include file="index/common/footer" /}
+{include file="index/common/script" /}
+</body>
+</html>

@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html>
+
+    <link rel="stylesheet" href="/static/layui/css/layui.css" media="all">
+    <script src="/static/layui/layui.js" charset="utf-8"></script>
+    <script src="/static/jquery.min.js" charset="utf-8"></script>
+{include file="index/common/head"/}
+<body>
+{include file="index/common/header" /}
+<style>
+    .profile-avatar-container {
+        position:relative;
+        width:100px;
+    }
+    .profile-avatar-container .profile-user-img{
+        width:100px;
+        height:100px;
+    }
+    .profile-avatar-container .profile-avatar-text {
+        display:none;
+    }
+    .profile-avatar-container:hover .profile-avatar-text {
+        display:block;
+        position:absolute;
+        height:100px;
+        width:100px;
+        background:#444;
+        opacity: .6;
+        color: #fff;
+        top:0;
+        left:0;
+        line-height: 100px;
+        text-align: center;
+    }
+    .profile-avatar-container button{
+        position:absolute;
+        top:0;left:0;width:100px;height:100px;opacity: 0;
+    }
+</style>
+<div id="content-container" class="container">
+    <div class="row">
+        <div class="col-md-3">
+            {include file="index/common/sidenav" /}
+        </div>
+        <div class="col-md-9">
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <h2 class="page-header">Personal Data</h2>
+                     <form class="layui-form" id="add-form" action="" lay-filter="add-form">
+        
+                    <input type="hidden" name="id" value="{$users.id}" />  
+  
+  <input type="hidden" name="groups_id" value="{$users.groups_id}" />
+             <div class="layui-form-item center">
+                   <label class="layui-form-label"></label>
+                 <div class="layui-input-inline">
+                        <div class="profile-avatar-container">
+                  <img id="image" class="profile-user-img img-responsive img-circle plupload" src="{$users.avatar}" alt="">
+            <span class="layui-upload-list">
+                             <div class="profile-avatar-text img-circle">{:__('Click Edit')}</div>
+               <button type="button" id="ajax-admin-avatar"><i class="fa fa-upload"></i>{:__('Edit')}</button>
+            </span>
+            <span class="layui-upload-list" style="padding-left: 20px;">
+            </span>
+                       </div>
+                   </div>
+                      
+            <input type="hidden" name="image" value="">
+        </div>
+
+        <div class="layui-form-item center">
+            <label class="layui-form-label">{:__('Member')}</label>
+            <div class="layui-input-inline">
+                <input type="text" name="username" id="username" value="{$users.username}" lay-verify="required"
+                       placeholder="会员名" autocomplete="off" class="form-control" readonly="readonly">
+            </div>
+        </div>  
+                <input type="hidden" id="password" name="password" value="{$users.password}">
+        <div class="layui-form-item">
+            <label class="layui-form-label">{:__('QQ')}</label>
+            <div class="layui-input-inline">
+                <input type="text" id="qq" name="qq" value="{$users.qq}" lay-verify="required" placeholder="请输入昵称" autocomplete="off" class="form-control">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">{:__('brief introduction')}</label>
+           <div class="layui-input-inline">
+                <input type="text" placeholder="{:__('Introduce yourself in one sentence')}" id="bio" name="bio" value="{$users.bio}" lay-verify="required" autocomplete="off"
+                       class="form-control">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">{:__('mailbox')}</label> 
+           <div class="layui-input-inline">
+                <span style="display: inline-block;">  
+                    <input type="text" placeholder="{:__('Please input email')}" id="email" name="email" value="{$users.email}" lay-verify="email" autocomplete="off" class="form-control" readonly="readonly"></span>
+                    <span class="input-group-btn" style="display: inline-block;padding:0;border:none;">
+                                        <a href="javascript:;" class="btn btn-info btn-change" data-type="email" id="emailtpl">{:__('modify')}</a>        
+                   </span>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">{:__('Mobile')}</label>
+             <div class="layui-input-inline">
+                      <span style="display: inline-block;">
+
+                   <input type="text" name="mobile" id="mobile" lay-verify="required" value="{$users.mobile}" placeholder="{:__('Please enter a new phone number')}" autocomplete="off" class="form-control" readonly="readonly"></span>
+
+                            
+                  <span class="input-group-btn" style="display: inline-block;padding:0;border:none;">
+                                        <a href="javascript:;" class="btn btn-info btn-captcha" data-type="mobile" id="mobiletpl">{:__('modify')}</a>
+                                    </span>
+            </div>
+        </div>
+       
+        <div class="layui-form-item">
+            <label class="layui-form-label"></label>
+           <div class="layui-input-inline">
+                <button class="layui-btn" lay-submit lay-filter="save">{:__('preservation')}</button>
+            </div>
+        </div>
+    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    {include file="index/common/script" /}
+
+</div> 
+  
+
+<script>
+
+
+   $("#emailtpl").click(function(){
+  // 打开窗口
+                layer.open({
+                     type: 1 //Page层类型
+                     ,area: ['500px', '360px']
+                     , title: '修改邮箱'
+                     ,shade: 0.1 //遮罩透明度
+                     ,maxmin: true //允许全屏最小化
+                     ,anim: 4 //0-6的动画形式，-1不开启
+                   
+                     , shadeClose: true
+                     , id: 'layui-id' //设定一个id，防止重复弹出
+                     , moveType: 1 //拖拽模式，0或者1
+                     , content: $("#e")
+                });
+ });
+ 
+   $("#mobiletpl").click(function(){
+               // 打开窗口
+                layer.open({  
+                     type: 1 //Page层类型
+                     ,area: ['500px', '300px']
+                     , title: '修改手机号'
+                     ,shade: 0.1 //遮罩透明度
+                     ,maxmin: true //允许全屏最小化
+                     ,anim: 4 //0-6的动画形式，-1不开启
+                   
+                     , shadeClose: true
+                     , id: 'layui-id' //设定一个id，防止重复弹出
+                     , moveType: 1 //拖拽模式，0或者1
+                     , content: $("#m")
+                });
+ });
+
+
+ </script>
+   <div id="e" style="display: none;">
+            
+    <form id="email-form" class="form-horizontal form-layer" method="POST" onclick="return false">
+        <div class="form-body" style="margin-top: 10px;">
+            <input type="hidden" name="id" value="{$users.id}" />
+            <input type="hidden" name="username" id="username" value="{$users.username}" >
+         
+              <div class="layui-form-item">
+            <label class="layui-form-label">{:__('Please select:')}</label>
+           <div class="layui-input-inline">
+               <select class="form-control" name="uid" id="uid" lay-verify="required" lay-search="" style="width: 100px;">
+                    <option value="2">{:__('Sina email')}</option>
+                    <option value="3">{:__('Enterprise mailbox')}</option> 
+                    <option value="4">{:__('Box 126')}</option>
+                   
+                </select></span>
+                </div>
+              </div> 
+              
+              <div class="layui-form-item">
+            <label class="layui-form-label">{:__('New email address:')}</label>
+           <div class="layui-input-inline">
+                <input type="text" placeholder="{:__('Please enter a new email')}" id="email" name="email" value="" lay-verify="required" autocomplete="off"
+                       class="form-control">
+            </div>
+        </div>
+         <div class="layui-form-item">
+            <label class="layui-form-label">{:__('Verification Code:')}</label>
+          <div class="layui-input-inline">
+                    <div class="input-group">
+                        <input type="text" name="code" id="code" class="form-control" data-rule="required" placeholder="{:__('Please enter the verification code')}"/>
+                        <span class="input-group-btn" style="padding:0;border:none;">
+                            <button style="width: 70px;" class="btn btn-info btn-captcha" data-type="email" lay-filter="e" id="emaila" lay-submit>{:__('obtain')}</button>
+                        </span>
+                    </div>
+                    <span class="msg-box"></span>
+                </div>
+            </div>
+                 
+              <div class="layui-form-item">
+            <label class="layui-form-label"></label>
+           <div class="layui-input-inline">
+                    <input type="submit" class="btn btn-info btn-captcha" lay-filter="ee" lay-submit value="{:__('Submit')}">
+                    <span class="msg-box"></span>
+                </div>
+            </div>    
+           
+        </div>
+        
+    </form>
+</div>
+<div id="m" style="display: none;">
+    <form id="mobile-form" class="form-horizontal form-layer" method="POST"  onclick="return false">
+        <div class="form-body" style="margin-top: 10px;">
+            <input type="hidden" name="id" value="{$users.id}" />
+              <input type="hidden" name="uid" id="uid" value="1" />
+            <div class="layui-form-item">
+            <label class="layui-form-label">{:__('New mobile phone:')}</label>
+            <div class="layui-input-inline">
+                    <input type="text" class="form-control" id="mobile" name="mobile" value="" data-rule="required;mobile" placeholder="{:__('Please enter a new phone number')}">
+                    <span class="msg-box"></span>
+                </div>
+            </div>
+           <div class="layui-form-item">
+            <label class="layui-form-label">{:__('Verification Code:')}</label>
+            <div class="layui-input-inline"> 
+                    <div class="input-group">
+                        <input type="text" name="code" id="code" class="form-control" data-rule="required" placeholder="{:__('Please enter the verification code')}"/>
+                        <span class="input-group-btn" style="padding:0;border:none;">
+                            <button style="width: 70px;" id="mobiles" class="btn btn-info btn-captcha" data-type="mobile" lay-filter="m" lay-submit>{:__('obtain')}</button>
+                        </span>
+                    </div>
+                    <span class="msg-box"></span>
+                </div>
+            </div>
+           <div class="layui-form-item">
+            <label class="layui-form-label"></label>
+           <div class="layui-input-inline">
+                    <button style="width: 70px;" class="btn btn-md btn-info" lay-filter="mm" lay-submit>{:__('Submit')}</button>
+                    <span class="msg-box"></span>
+                </div>
+            </div>
+
+        </div>
+       
+    </form>
+</div>
+<style>
+.notClick{
+height:30px; pointer-events: none
+ } 
+</style>
+  <script>
+      layui.use(['util', 'upload', 'table', 'form', 'laydate', 'layer', 'jquery'], function () {
+            var table = layui.table;
+            var layer = layui.layer;
+            var laydate = layui.laydate;
+            var upload = layui.upload;
+            var util = layui.util;
+            var form = layui.form;
+            var $ = layui.jquery;
+       // var load = layer.load(3, {time: 5*1000});
+        form.render();
+
+form.on('submit(e)', function (data) {
+    var index = layer.msg('{:__('Sending, please wait')}', {
+        icon: 16,
+        time: false,
+        shade: 0.3
+    });
+    $.ajax({
+        url: "/user/email",
+        type: data.form.method,
+        dataType: 'json',
+        data: $(data.form).serialize(),
+        success: function (result) {
+            if (result.code === 0) {
+                setTimeout(function () {
+                     if(isNaN(parseInt($("#emaila").html()))){
+                        var origText  = '60';
+                        var interval = setInterval(function(){
+                            var time = --origText;
+                            if(time <= 0) {
+                                clearInterval(interval);
+                                $('#emaila').html('{:__('Resend')}').css('border','none').css('color','#ffffff').css('background','#009688').removeClass("notClick");
+                            }else{
+                                $('#emaila').html(time+'&nbsp;&nbsp;{:__('second')}').css('border','1px solid #f2f2f2').css('color','#616161').css('background','buttonface').addClass('notClick');
+                            
+                        }
+                        }, 1000);
+                   // parent.location.reload();
+                   }
+                }, 1000);
+
+            layer.close(index);
+            layer.msg(result.msg, {icon: 1});
+            }else{
+                
+            layer.close(index);
+            layer.msg(result.msg, {icon: 2});
+            }
+        },
+    });
+    return false;
+});
+form.on('submit(ee)', function (data) {
+    var index = layer.msg('{:__('Verification in progress, please wait')}', {
+        icon: 16,
+        time: false,
+        shade: 0.3
+    });
+
+    $.ajax({
+        url: "/user/changeemail",
+        type: data.form.method,
+        dataType: 'json',
+        data: $(data.form).serialize(),
+        success: function (result) {
+            if (result.code === 0) {
+                setTimeout(function () {
+                    parent.location.reload();
+                }, 1000);
+
+            layer.close(index);
+            layer.msg(result.msg, {icon: 1});
+            }else{
+                
+            layer.close(index);
+            layer.msg(result.msg, {icon: 2});
+            }
+        },
+    });
+    return false;
+});
+//修改手机
+form.on('submit(m)', function (data) {
+    var index = layer.msg('{:__('Sending, please wait')}', {
+        icon: 16,
+        time: false,
+        shade: 0.3
+    });
+    $.ajax({
+        url: "/user/mobile",
+        type: data.form.method,
+        dataType: 'json',
+        data: $(data.form).serialize(),
+        success: function (result) {
+            if (result.code === 0) {
+            $('input[name="code"]').val(result.captcha);
+                setTimeout(function () {
+                     if(isNaN(parseInt($("#mobiles").html()))){
+                        var origText  = '60';
+                        var interval = setInterval(function(){
+                            var time = --origText;
+                            if(time <= 0) {
+                                clearInterval(interval);
+                                $('#mobiles').html('{:__('Resend')}').css('border','1px solid #f2f2f2').css('color','#ffffff').css('background','#009688').removeClass("notClick");
+                            }else{
+                                $('#mobiles').html(time+'&nbsp;&nbsp;{:__('second')}').css('border','1px solid #f2f2f2').css('color','#616161').css('background','buttonface').addClass('notClick');
+                            
+                        }
+                        }, 1000);
+                   // parent.location.reload();
+                   }
+                }, 1000);
+
+            layer.close(index);
+            layer.msg(result.msg, {icon: 1});
+            }else{
+                
+            layer.close(index);
+            layer.msg(result.msg, {icon: 2});
+            }
+        },
+    });
+    return false;
+});
+form.on('submit(mm)', function (data) {
+    var index = layer.msg('{:__('Verification in progress, please wait')}', {
+        icon: 16,
+        time: false,
+        shade: 0.3
+    });
+
+    $.ajax({
+        url: "/user/changemobile",
+        type: data.form.method,
+        dataType: 'json',
+        data: $(data.form).serialize(),
+        success: function (result) {
+            if (result.code === 0) {
+                setTimeout(function () {
+                   parent.location.reload();
+                }, 1000);
+
+            layer.close(index);
+            layer.msg(result.msg, {icon: 1});
+            }else{
+                
+            layer.close(index);
+            layer.msg(result.msg, {icon: 2});
+            }
+        },
+    });
+    return false;
+});
+
+        //普通图片上传
+      var uploadInst = upload.render({
+    elem: '#ajax-admin-avatar',
+            exts: 'jpg|png|jpeg|gif|svg',
+            size: 2048,
+    url: '/profile/uploadImage', //改成您自己的上传接口
+    done: function (result) {
+        // 上传完毕回调
+        if (result.code === 1) {
+            $('#image').attr('src', result.url);
+            //this.item.prev('input').val(result.url);
+            $('input[name="image"]').val(result.url);
+            layer.msg('上传成功', {icon: 1});
+        } else {
+            layer.msg(result.msg, {icon: 2});
+        }
+    }
+        });
+
+       
+        //表单提交
+        form.on('submit(save)', function (data) {
+        var index = layer.msg('{:__('Submitting, please wait')}', {
+        icon: 16,
+        time: false,
+        shade: 0.3
+    });
+            params = data.field;
+            submit($, params);
+            return false;
+        });
+
+        // 新增
+        function submit($, params) {
+            var url = '/profile/edit';
+            $.post(url, params, function (res) {
+                if (res.code == 0) {
+                    layer.msg(res.msg, {icon: 1});
+                    setTimeout(function () {
+                        layer.closeAll();   // 关闭弹窗
+                        location.reload();  // 页面刷新
+                    }, 1500)
+                } else {
+                    layer.msg(res.msg, {icon: 0})
+                }
+            }, 'json');
+        }
+       
+});
+
+</script>
+{include file="index/common/footer" /}
+</html>
